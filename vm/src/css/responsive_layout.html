@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width = device-width,initial-scale=1">
+    <title>responsive_layout</title>
+    <style type="text/css" >
+        *{
+            margin:0 auto;
+            padding:0 auto;
+        }
+        .header,
+        .container,
+        .footer{
+            margin: 10px auto;
+        }
+        .header{
+            background-color: chocolate;
+            height:100px;
+        }
+        .left,
+        .main,
+        .right{
+            background-color: blue;
+        }
+        .footer{
+            background-color: red;
+            height: 100px;
+        }
+
+        @media screen and (min-width: 960px) {
+            .header,
+            .container,
+            .footer{
+                width: 960px;
+            }
+
+            .left,
+            .main,
+            .right{
+                float: left;
+                height: 500px;
+            }
+
+            .left,
+            .right{
+                width:200px;
+            }
+
+            .main{
+                width:550px;
+                margin:0px 5px;
+            }
+
+            .container{
+                height:500px;
+            }
+        }
+
+        @media screen and (min-width: 600px) and (max-width: 960px){
+            .header,
+            .container,
+            .footer{
+                width: 600px;
+            }
+
+            .left,
+            .main{
+               height: 400px;
+                float: left;
+            }
+
+            .right{
+                display: none;
+            }
+
+            .left{
+                width:160px;
+            }
+            .main{
+                margin-left: 5px ;
+                width:435px;
+            }
+            .container{
+                height:400px;
+            }
+        }
+        @media screen and (max-width: 600px){
+            .header,
+            .container,
+            .footer{
+                width: 400px;
+            }
+
+            .left,
+            .right{
+                width:400px;
+                height: 100px;
+
+            }
+
+            .main{
+                margin-top: 10px;
+                margin-bottom:10px;
+                width: 400px;
+                height:200px;
+            }
+
+            .container{
+                height: 420px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header"></div>
+    <div class="container">
+        <div class="left"></div>
+        <div class="main"></div>
+        <div class="right"></div>
+    </div>
+    <div class="footer"></div>
+</body>
+</html>

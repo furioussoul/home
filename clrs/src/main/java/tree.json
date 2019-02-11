@@ -1,0 +1,92 @@
+{
+  "key": 2,
+  "color": "black",
+  "level": null,
+  "left": {
+    "key": 1,
+    "color": "black",
+    "level": null,
+    "left": {
+      "key": null,
+      "color": "black",
+      "level": null,
+      "left": null,
+      "right": null
+    },
+    "right": {
+      "key": null,
+      "color": "black",
+      "level": null,
+      "left": null,
+      "right": null
+    }
+  },
+  "right": {
+    "key": 4,
+    "color": "red",
+    "level": null,
+    "left": {
+      "key": 3,
+      "color": "black",
+      "level": null,
+      "left": {
+        "key": null,
+        "color": "black",
+        "level": null,
+        "left": null,
+        "right": null
+      },
+      "right": {
+        "key": null,
+        "color": "black",
+        "level": null,
+        "left": null,
+        "right": null
+      }
+    },
+    "right": {
+      "key": 6,
+      "color": "black",
+      "level": null,
+      "left": {
+        "key": 5,
+        "color": "red",
+        "level": null,
+        "left": {
+          "key": null,
+          "color": "black",
+          "level": null,
+          "left": null,
+          "right": null
+        },
+        "right": {
+          "key": null,
+          "color": "black",
+          "level": null,
+          "left": null,
+          "right": null
+        }
+      },
+      "right": {
+        "key": 7,
+        "color": "red",
+        "level": null,
+        "left": {
+          "key": null,
+          "color": "black",
+          "level": null,
+          "left": null,
+          "right": null
+        },
+        "right": {
+          "key": null,
+          "color": "black",
+          "level": null,
+          "left": null,
+          "right": null
+        }
+      }
+    }
+  }
+}
+

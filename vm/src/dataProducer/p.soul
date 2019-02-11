@@ -1,0 +1,15 @@
+@table{
+    area,city,province,country,
+    user,role,user_role;
+}
+@cascading{
+  area.city rely city.id;
+  city.province rely province.id;
+  province.country rely country.id;
+  user.id rely user_role.user_id;
+  role.id rely user_role.role_id;
+  user.country rely country.id;
+}
+@field{
+
+}

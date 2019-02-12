@@ -14,14 +14,14 @@ public class CutRod {
         if (length == 0) {
             return 0;
         }
-        if(cache[length-1] >= 0){
-            return cache[length-1];
+        if (cache[length - 1] >= 0) {
+            return cache[length - 1];
         }
         int maxPrice = -1;
         for (int i = 1; i <= length; i++) {
             maxPrice = max(maxPrice, price[i - 1] + calMaxIncome(length - i));
         }
-        cache[length-1] = maxPrice;
+        cache[length - 1] = maxPrice;
         return maxPrice;
     }
 
@@ -33,7 +33,7 @@ public class CutRod {
         this.price = new int[40];
         this.cache = new int[40];
         for (int i = 0; i < 40; i++) {
-            this.price[i] = i*2 + i;
+            this.price[i] = i * 2 + i;
             this.cache[i] = -1;
         }
     }

@@ -8,9 +8,9 @@ import org.junit.Test;
  */
 public class HeapSort {
 
-    private int[] origin = {9, 0, 8, 100, 6, 5, 4, 11, 2, 1};
     private static int MIN_QUEUE_TYPE = 1; // 最小堆
     private static int MAX_QUEUE_TYPE = 2; // 最大堆
+    private int[] origin = {9, 0, 8, 100, 6, 5, 4, 11, 2, 1};
 
     @Test
     public void buildMax() {
@@ -19,6 +19,7 @@ public class HeapSort {
             System.out.print(x + " ");
         }
     }
+
     @Test
     public void buildMin() {
         buildHeap(origin, 1);
@@ -88,10 +89,10 @@ public class HeapSort {
     }
 
     private int left(int index) {
-        return (index+1)*2 - 1;
+        return (index + 1) * 2 - 1;
     }
 
     private int right(int index) {
-        return (index+1)*2;
+        return (index + 1) * 2;
     }
 }

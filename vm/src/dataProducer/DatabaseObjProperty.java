@@ -5,7 +5,7 @@ package dataProducer;
  */
 public class DatabaseObjProperty {
 
-    public static void getPro(){
+    public static void getPro() {
 
     }
 }

@@ -1,10 +1,8 @@
 package clrs.chapter13;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.org.apache.regexp.internal.RE;
 import org.junit.Test;
 
 import java.util.LinkedList;
@@ -26,26 +24,6 @@ public class RedBlackTree {
     private static String BLACK = "black";
     private Node nil = new Node(null, BLACK);
     private Node root = null;
-
-    public static class Node {
-        public Integer key;
-        public String color;
-        public Integer level;
-        public Node left;
-        public Node right;
-        @JsonIgnore
-        public Node parent;
-
-        public Node(Integer key) {
-            this.key = key;
-        }
-
-        public Node(Integer key, String color) {
-            this.key = key;
-            this.color = color;
-        }
-    }
-
 
     private void leftRotate(Node x) {
         if (x != nil && x.right != nil) {
@@ -307,5 +285,24 @@ public class RedBlackTree {
         tree.delete(tree.search(2));
         tree.delete(tree.search(5));
         System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(tree.root));
+    }
+
+    public static class Node {
+        public Integer key;
+        public String color;
+        public Integer level;
+        public Node left;
+        public Node right;
+        @JsonIgnore
+        public Node parent;
+
+        public Node(Integer key) {
+            this.key = key;
+        }
+
+        public Node(Integer key, String color) {
+            this.key = key;
+            this.color = color;
+        }
     }
 }

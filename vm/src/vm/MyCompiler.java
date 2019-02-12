@@ -1,11 +1,11 @@
 package vm;
 
+import org.antlr.v4.runtime.tree.TerminalNode;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
  * Created by szj on 2016/6/8.

@@ -5,26 +5,26 @@ package vm;
  */
 public class ActiveOperand {
 
-	private Class clazz;	 
-	
-	private Object value;
+    private Class clazz;
 
-	public ActiveOperand(Class clazz, Object value) {
-		super();
-		this.clazz = clazz;
-		this.value = value;
-	}
+    private Object value;
 
-	public Object getValue() {
-		return value;
-	}
+    public ActiveOperand(Class clazz, Object value) {
+        super();
+        this.clazz = clazz;
+        this.value = value;
+    }
 
-	public Class getClazz() {
-		return clazz;
-	}
+    public Object getValue() {
+        return value;
+    }
 
-	@Override
-	public String toString() {
-		return clazz.toString() + " " + value.toString();
-	}
+    public Class getClazz() {
+        return clazz;
+    }
+
+    @Override
+    public String toString() {
+        return clazz.toString() + " " + value.toString();
+    }
 }

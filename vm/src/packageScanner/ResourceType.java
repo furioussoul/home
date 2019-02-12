@@ -1,17 +1,17 @@
 package packageScanner;
 
 public enum ResourceType {
-	JAR("jar"), FILE("file"),
+    JAR("jar"), FILE("file"),
 
-	CLASS_FILE(".class");
+    CLASS_FILE(".class");
 
-	private String typeString;
+    private String typeString;
 
-	private ResourceType(String type) {
-		this.typeString = type;
-	}
+    private ResourceType(String type) {
+        this.typeString = type;
+    }
 
-	public String getTypeString() {
-		return this.typeString;
-	}
+    public String getTypeString() {
+        return this.typeString;
+    }
 }

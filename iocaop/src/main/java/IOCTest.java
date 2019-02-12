@@ -19,7 +19,7 @@ public class IOCTest {
     public static void tesXML() throws Exception {
         String xmlLocation = "ioc-aop/ioc.xml";
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext(xmlLocation);
-        Person p = (Person)applicationContext.getBean("person");
+        Person p = (Person) applicationContext.getBean("person");
         p.say();
     }
 
@@ -32,7 +32,7 @@ public class IOCTest {
     public static void tesAnnotation() throws Exception {
         String packageLocation = "domain";
         ApplicationContext applicationContext = new AnnotationApplicationContext(packageLocation);
-        Bird b = (Bird)applicationContext.getBean("WalkBird");
+        Bird b = (Bird) applicationContext.getBean("WalkBird");
         b.fly();
     }
 
@@ -45,13 +45,13 @@ public class IOCTest {
     public static void tesAop() throws Exception {
         String packageLocation = "domain";
         ApplicationContext applicationContext = new AnnotationApplicationContext(packageLocation);
-        Bird b = (Bird)applicationContext.getBean("FlyBird");
+        Bird b = (Bird) applicationContext.getBean("FlyBird");
         b.fly();
     }
 
     public static void main(String[] arg) throws Exception {
-       tesXML();
-       tesAnnotation();
-       tesAop();
+        tesXML();
+        tesAnnotation();
+        tesAop();
     }
 }

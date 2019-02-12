@@ -1,7 +1,5 @@
 package dataProducer;
 
-import java.util.*;
-
 public class SequenceResolver {
 
     public List<String> sequence = new ArrayList<>();
@@ -14,17 +12,17 @@ public class SequenceResolver {
             cache.add(entry.getKey());
         }
         for (String table : Table.tables) {
-            if(!cache.contains(table)){
+            if (!cache.contains(table)) {
                 sequence.add(table);
                 deCasCache.add(table);
             }
         }
-        while(!Cascading.casCacheTable.isEmpty()){
+        while (!Cascading.casCacheTable.isEmpty()) {
             getResidueFromCascading();
         }
     }
 
-    public void getResidueFromCascading(){
+    public void getResidueFromCascading() {
         Cascading.deCascade(deCasCache);
         List<String> relierrsWithoutReliereds = Cascading.getReliersWithoutReliereds();
         sequence.addAll(relierrsWithoutReliereds);

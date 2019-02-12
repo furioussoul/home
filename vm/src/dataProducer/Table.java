@@ -9,7 +9,7 @@ import java.util.List;
 public class Table {
     public static List<String> tables = new ArrayList<>();
 
-    public static void add(String table){
+    public static void add(String table) {
         tables.add(table);
     }
 }

@@ -23,7 +23,7 @@ public class Test {
             compiler.visit(parser.prog());
             SequenceResolver sequenceResolver = new SequenceResolver();
             sequenceResolver.getResidueFromTables();
-            for(String seq : sequenceResolver.sequence){
+            for (String seq : sequenceResolver.sequence) {
                 System.out.println(seq + "  ");
             }
         }

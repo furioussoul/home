@@ -4,19 +4,19 @@ package dataProducer;
  * Created by szj on 2016/7/14.
  */
 public class Controller {
-    private String preSql(){
+    private String preSql() {
         SequenceResolver resolver = new SequenceResolver();
-        for(String seq : resolver.sequence){
+        for (String seq : resolver.sequence) {
             Field field = Field.getFieldValue(seq);
-            if(field == null){
+            if (field == null) {
                 field = Field.getFieldRange(seq);
-                if(field == null){
+                if (field == null) {
                     throw new RuntimeException("字段定义了却没有定义值");
                 }
                 return SqlFactory.createSql(field);
-            }else{
+            } else {
                 Field field0 = Field.getFieldRange(seq);
-                if(field != null){
+                if (field != null) {
                     field.range = field0.range;
                 }
                 return SqlFactory.createSql(field);
@@ -25,13 +25,13 @@ public class Controller {
         return "";
     }
 
-    private String createSql(){
+    private String createSql() {
         preSql();
         DataBaseMonitor.getPro("user");
         return "";
     }
 
-    private void doCreateObj2DB(){
+    private void doCreateObj2DB() {
         DataBaseMonitor.create();
     }
 }

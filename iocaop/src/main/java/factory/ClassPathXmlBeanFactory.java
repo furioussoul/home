@@ -10,7 +10,7 @@ import ioc.xml.XmlBeanDefinitionReader;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-public class ClassPathXmlBeanFactory extends AbstractBeanFactory{
+public class ClassPathXmlBeanFactory extends AbstractBeanFactory {
     /**
      * @param location 定义bean的xml的路径
      */
@@ -21,14 +21,14 @@ public class ClassPathXmlBeanFactory extends AbstractBeanFactory{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        for(Map.Entry<String, BeanDefinition> beanDefinitionMap : reader.getRegistry().entrySet()){
+        for (Map.Entry<String, BeanDefinition> beanDefinitionMap : reader.getRegistry().entrySet()) {
             this.registerBeanDefinition(beanDefinitionMap.getKey(), beanDefinitionMap.getValue());
         }
     }
 
     @Override
     public Object getBean(String name) throws Exception {
-        if(iocContainer.containsKey(name)){
+        if (iocContainer.containsKey(name)) {
             return iocContainer.get(name);
         }
         Object object = create(name);
@@ -49,12 +49,12 @@ public class ClassPathXmlBeanFactory extends AbstractBeanFactory{
                 if (!field.isAccessible()) {
                     field.setAccessible(true);
                 }
-                if(propertyValue.getValue() instanceof BeanReference){
-                    BeanReference beanReference = (BeanReference)propertyValue.getValue();
+                if (propertyValue.getValue() instanceof BeanReference) {
+                    BeanReference beanReference = (BeanReference) propertyValue.getValue();
                     String ref = beanReference.getRef();
                     Object refBean = getBean(ref);
                     field.set(object, refBean);
-                }else {
+                } else {
                     field.set(object, propertyValue.getValue());
                 }
             }

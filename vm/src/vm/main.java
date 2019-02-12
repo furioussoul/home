@@ -3,7 +3,6 @@ package vm;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.io.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +31,7 @@ public class main {
             for (Map.Entry<String, List<Instruction>> e : set) {
                 System.out.println();
                 System.out.println(e.getKey());
-                for(Instruction ins: e.getValue()){
+                for (Instruction ins : e.getValue()) {
                     System.out.println(ins.toString());
                 }
             }

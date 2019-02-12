@@ -2,9 +2,6 @@ package chapter10;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by szj on 2016/6/23.
  */
@@ -16,7 +13,7 @@ public class Queue<E> {
     private Object[] queue = new Object[size];
 
     @Test
-    public void main(){
+    public void main() {
         Queue<Integer> queue = new Queue<>();
         queue.enqueue(2);
         queue.enqueue(1);
@@ -26,41 +23,43 @@ public class Queue<E> {
         queue.enqueue(6);
         queue.enqueue(7);
         Integer e = queue.dequeue();
-        while (e != null){
+        while (e != null) {
             System.out.print(e + " ");
             e = queue.dequeue();
         }
     }
 
 
-    public void enqueue(E e){
-        if(isFull()){
+    public void enqueue(E e) {
+        if (isFull()) {
             throw new RuntimeException("queue is full");
         }
         queue[tail] = e;
-        if(tail == size - 1){
+        if (tail == size - 1) {
             tail = 0;
-        }else{
+        } else {
             tail++;
         }
     }
-    public E dequeue(){
-        if(isEmpty()){
+
+    public E dequeue() {
+        if (isEmpty()) {
             throw new RuntimeException("queue is empty");
         }
         Object e = queue[head];
-        if(head == size - 1){
+        if (head == size - 1) {
             head = 0;
-        }else{
+        } else {
             head++;
         }
-        return (E)e;
+        return (E) e;
     }
 
-    private boolean isFull(){
+    private boolean isFull() {
         return tail + 1 == head ? true : false;
     }
-    private boolean isEmpty(){
+
+    private boolean isEmpty() {
         return head == tail ? true : false;
     }
 }

@@ -1,7 +1,5 @@
 package dataProducer;
 
-import java.util.*;
-
 /**
  * Created by szj on 2016/7/10.
  */
@@ -46,7 +44,7 @@ public class Cascading {
                 deleteBuffer.add(entry.getKey());
             }
         }
-        for(String s : deleteBuffer){
+        for (String s : deleteBuffer) {
             casCacheTable.remove(s);
         }
         return reliersWithoutReliereds;

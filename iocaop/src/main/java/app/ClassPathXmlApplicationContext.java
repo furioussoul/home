@@ -7,7 +7,7 @@ import factory.ClassPathXmlBeanFactory;
  * classpath下xml配置的bean会实例化到这个上下文
  * Created by 孙证杰 on 2017/8/1.
  */
-public class ClassPathXmlApplicationContext extends AbstractApplicationContext{
+public class ClassPathXmlApplicationContext extends AbstractApplicationContext {
     public ClassPathXmlApplicationContext(String xmlLocation) {
         this.beanFactory = new ClassPathXmlBeanFactory(xmlLocation);
     }

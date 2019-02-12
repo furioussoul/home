@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-  /**
+/**
  * Created by szj on 2016/6/10.
  * o(n)
  */
@@ -25,8 +25,8 @@ public class BinaryAdd {
         }
         //print output
         Collections.reverse(x3);
-        for(int i : x3){
-            System.out.print(i+" ");
+        for (int i : x3) {
+            System.out.print(i + " ");
         }
     }
 

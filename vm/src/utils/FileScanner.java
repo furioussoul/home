@@ -2,9 +2,7 @@ package utils;
 
 import org.junit.Test;
 
-import java.io.*;
 import java.util.Stack;
-import java.util.regex.Pattern;
 
 /**
  * Created by szj on 2016/6/24.
@@ -20,61 +18,61 @@ public class FileScanner {
     File outPutFile = new File(OUTPUT);
 
     @Test
-    public void main(){
+    public void main() {
         scan(ROOT);
     }
 
-    private void scan(String root){
+    private void scan(String root) {
         STACK.push(new File(root));
-        while(STACK.size() != 0){
+        while (STACK.size() != 0) {
             File file = STACK.pop();
-            if(file.isDirectory()){
+            if (file.isDirectory()) {
                 File[] files = scanDirectory(file);
-                for(File f : files){
+                for (File f : files) {
                     STACK.push(f);
                 }
-            }else{
+            } else {
                 scanFile2(file);
             }
         }
-        try{
+        try {
             write(outPutFile, buffer.toString());
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.print(e.getMessage());
         }
     }
 
-    private File[] scanDirectory(File directory){
+    private File[] scanDirectory(File directory) {
         File[] files = directory.listFiles();
         return files == null ? new File[0] : files;
     }
 
     private void scanFile(File file) {
-        try{
-            if(file.getName().equals(DATE)){
-                InputStreamReader  reader = new InputStreamReader (new FileInputStream(file), "gbk");
+        try {
+            if (file.getName().equals(DATE)) {
+                InputStreamReader reader = new InputStreamReader(new FileInputStream(file), "gbk");
                 while (reader.ready()) {
                     buffer.append((char) reader.read());
                 }
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.print(e.getMessage());
         }
     }
 
-    private void scanFile2(File file){
+    private void scanFile2(File file) {
 
         try {
-            InputStreamReader  isr = new InputStreamReader (new FileInputStream(file), "gbk");
+            InputStreamReader isr = new InputStreamReader(new FileInputStream(file), "gbk");
             BufferedReader br = new BufferedReader(isr);
             String line = br.readLine();
-            while(line != null){
-                if(line.contains(seq)){
+            while (line != null) {
+                if (line.contains(seq)) {
                     buffer.append(line).append("\r\n");
                 }
                 line = br.readLine();
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.print(e.getMessage());
         }
     }

@@ -5,11 +5,12 @@ package designPattern.factory;
  */
 public abstract class AbstractFactory {
     private Class clazz;
-    public AbstractFactory(Class clazz){
+
+    public AbstractFactory(Class clazz) {
         this.clazz = clazz;
     }
 
-    protected void initClazz(){
+    protected void initClazz() {
         System.out.println("---initing clazz---");
     }
 

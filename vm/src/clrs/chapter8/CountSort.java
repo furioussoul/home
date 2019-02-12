@@ -14,25 +14,25 @@ public class CountSort {
     private int[] c = new int[20]; // count how many numbers smaller than it
 
     @Test
-    public void main(){
+    public void main() {
         countSort(a);
-        for(int x : b){
+        for (int x : b) {
             System.out.print(x + " ");
         }
     }
 
-    public void countSort(int[] sort){
+    public void countSort(int[] sort) {
         // store count of every element  in array c
-        for(int i = 0; i < sort.length; i++){
+        for (int i = 0; i < sort.length; i++) {
             c[sort[i]] += 1;
         }
         // store count of elements not bigger than c[i] in array c
-        for(int i = 1; i < c.length; i++){
-            c[i] = c[i] + c[i-1];
+        for (int i = 1; i < c.length; i++) {
+            c[i] = c[i] + c[i - 1];
         }
         // already known count of elements not bigger than every elemnts in the input,
         // sort input by it
-        for(int i = a.length - 1; i >0; i--){
+        for (int i = a.length - 1; i > 0; i--) {
             b[c[sort[i]] - 1] = sort[i];
             c[sort[i]] -= 1;
         }

@@ -10,22 +10,6 @@ public class Tree {
 
     private Node root;
 
-    private static class Node {
-        private Node parent;
-        private Node left;
-        private Node right;
-        private Integer element;
-
-        private Node(Integer e) {
-            this.element = e;
-        }
-
-        @Override
-        public String toString() {
-            return element + "";
-        }
-    }
-
     //up search or down search
     public Node predecessor(Node node) {
         Node predecessor = null;
@@ -173,5 +157,21 @@ public class Tree {
         tree.insert(6);
         tree.delete(tree.search(2));
         tree.walk(tree.root);
+    }
+
+    private static class Node {
+        private Node parent;
+        private Node left;
+        private Node right;
+        private Integer element;
+
+        private Node(Integer e) {
+            this.element = e;
+        }
+
+        @Override
+        public String toString() {
+            return element + "";
+        }
     }
 }

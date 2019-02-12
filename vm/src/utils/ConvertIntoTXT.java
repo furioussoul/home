@@ -3,7 +3,6 @@ package utils;
 import org.junit.Test;
 import packageScanner.PkgScanner;
 
-import java.io.*;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -16,19 +15,20 @@ public class ConvertIntoTXT {
     private static final String OUTPUT_DIRECTORY = "D:\\out\\";
     private static final int LINE_NUMBER = 60;
     private static int counter = 0;
+
     @Test
     public void main() throws IOException {
         String packName = "com.kashuo.crm";
         PkgScanner scanner = new PkgScanner(packName, Cut.class);
-        List<String> list =  scanner.scan();
-        for(String s : list){
+        List<String> list = scanner.scan();
+        for (String s : list) {
             convertFile(parsePath(s));
         }
         System.out.println(counter);
     }
 
-    private String parsePath(String classPath){
-        return INPUT_DIRECTORY + "src\\main\\java\\" + classPath.replace('.','\\') + ".java";
+    private String parsePath(String classPath) {
+        return INPUT_DIRECTORY + "src\\main\\java\\" + classPath.replace('.', '\\') + ".java";
     }
 
     public void convertFile(String filePath) throws IOException {
@@ -42,15 +42,15 @@ public class ConvertIntoTXT {
         while ((line = reader.readLine()) != null) {
             i++;
             buffer.append(line + "\r\n");
-            if(i == LINE_NUMBER){
+            if (i == LINE_NUMBER) {
                 convertLines(file.getName().substring(
                         0, file.getName().lastIndexOf('.')) + ++j + ".txt", buffer.toString());
-                i=0;
+                i = 0;
                 buffer.setLength(0);
             }
         }
         reader.close();
-        if(buffer.length() != 0){
+        if (buffer.length() != 0) {
             convertLines(file.getName().substring(
                     0, file.getName().lastIndexOf('.')) + ++j + ".txt", buffer.toString());
         }

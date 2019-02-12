@@ -12,6 +12,7 @@ import java.util.List;
 public class RandomizedSelect {
 
     private static List<Integer> input = new ArrayList<>();
+
     static {
         input.add(1);
         input.add(2);

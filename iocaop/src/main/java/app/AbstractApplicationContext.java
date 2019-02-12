@@ -5,7 +5,7 @@ import factory.BeanFactory;
 /**
  * Created by 孙证杰 on 2017/8/1.
  */
-public class AbstractApplicationContext implements ApplicationContext{
+public class AbstractApplicationContext implements ApplicationContext {
 
     protected BeanFactory beanFactory;
 

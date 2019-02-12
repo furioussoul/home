@@ -4,7 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/clrs/clrs.iml" filepath="$PROJECT_DIR$/clrs/clrs.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/home.iml" filepath="$PROJECT_DIR$/.idea/home.iml" />
+      <module fileurl="file://$PROJECT_DIR$/iocaop/ioc-aop.iml" filepath="$PROJECT_DIR$/iocaop/ioc-aop.iml" />
       <module fileurl="file://$PROJECT_DIR$/iocaop/iocaop.iml" filepath="$PROJECT_DIR$/iocaop/iocaop.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vm/soul_virtual_machine.iml" filepath="$PROJECT_DIR$/vm/soul_virtual_machine.iml" />
       <module fileurl="file://$PROJECT_DIR$/vm/vm.iml" filepath="$PROJECT_DIR$/vm/vm.iml" />
     </modules>
   </component>

@@ -7,6 +7,7 @@ package app;
 public interface ApplicationContext {
     /**
      * 根据name从IOC容器获取bean实例
+     *
      * @param name bean的name
      * @return bean
      * @throws Exception

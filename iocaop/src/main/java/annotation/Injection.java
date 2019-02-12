@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * Created by 孙证杰 on 2017/8/1.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD,ElementType.FIELD})
+@Target({ElementType.METHOD, ElementType.FIELD})
 public @interface Injection {
     String value() default "";
 }

@@ -47,20 +47,25 @@ public class Frame {
     public Instruction getInstruction() {
         return this.inslist.get(ir);
     }
+
     //栈
     public void pushActiveOperand(ActiveOperand ao) {
         this.stack.push(ao);
     }
+
     public ActiveOperand popActiveOperand() {
         return this.stack.pop();
     }
+
     public ActiveOperand peekActiveOperand() {
         return this.stack.peek();
     }
+
     //取局部变量
     public ActiveOperand getActiveOperand(String variable) {
         return this.localMap.get(variable);
     }
+
     //设置局部变量
     public void putActiveOperand(String variable, ActiveOperand ao) {
         this.localMap.put(variable, ao);

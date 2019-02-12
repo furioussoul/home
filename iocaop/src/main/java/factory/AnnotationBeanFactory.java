@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by 孙证杰 on 2017/8/1.
  */
-public class AnnotationBeanFactory extends AbstractBeanFactory{
+public class AnnotationBeanFactory extends AbstractBeanFactory {
     /**
      * @param packageLocation 定义bean的包路径,扫描特定注解并实例化
      */
@@ -22,7 +22,7 @@ public class AnnotationBeanFactory extends AbstractBeanFactory{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(clazzUrlList != null){
+        if (clazzUrlList != null) {
             for (String clazz : clazzUrlList) {
                 try {
                     Object bean = Class.forName(clazz).newInstance();
@@ -37,7 +37,7 @@ public class AnnotationBeanFactory extends AbstractBeanFactory{
 
     @Override
     public Object getBean(String name) throws Exception {
-        if(iocContainer.containsKey(name)){
+        if (iocContainer.containsKey(name)) {
             return iocContainer.get(name);
         }
         BeanDefinition beanDefinition = beanDefinitionMap.get(name);

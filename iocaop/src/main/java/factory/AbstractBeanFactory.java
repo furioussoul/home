@@ -10,9 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractBeanFactory implements BeanFactory {
 
-    protected Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
     protected final List<String> beanDefinitionNames = new ArrayList<>();
     protected final Map<String, Object> iocContainer = new ConcurrentHashMap<>();
+    protected Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
     protected BeanPostProcessor beanPostProcessor = new BeanPostProcessor();
 
     @Override

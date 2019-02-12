@@ -18,9 +18,9 @@ public class Main {
         adapters.add(new HttpControllerAdapter());
     }
 
-    public void doControll(Object controller){
-        for(Adapter adapter : adapters){
-            if(adapter.supports(controller)){
+    public void doControll(Object controller) {
+        for (Adapter adapter : adapters) {
+            if (adapter.supports(controller)) {
                 adapter.handle(controller);
                 return;
             }
@@ -29,26 +29,28 @@ public class Main {
     }
 
     @Test
-    public void test0(){
+    public void test0() {
         doControll(new HttpController());
     }
 
 
-    /**以下不使用适配器**/
+    /**
+     * 以下不使用适配器
+     **/
     @Test
-    public void test1(){
+    public void test1() {
         doControll(new HttpController());
     }
 
-    public void doCon(Object controller){
-       if(controller instanceof HttpController){
-           ((HttpController)controller).controll();
-       }else if(controller instanceof UdpController){
-           ((UdpController)controller).controll();
-       }else if (controller instanceof TcpController) {
-           ((TcpController)controller).controll();
-       }else {
-           throw new UnsupportedOperationException();
-       }
+    public void doCon(Object controller) {
+        if (controller instanceof HttpController) {
+            ((HttpController) controller).controll();
+        } else if (controller instanceof UdpController) {
+            ((UdpController) controller).controll();
+        } else if (controller instanceof TcpController) {
+            ((TcpController) controller).controll();
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 }

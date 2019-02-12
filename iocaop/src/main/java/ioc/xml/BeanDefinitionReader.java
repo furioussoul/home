@@ -5,10 +5,11 @@ package ioc.xml;
  */
 public interface BeanDefinitionReader {
 
-	/**
-	 * 加载bean定义到内存
-	 * @param location bean的地址
-	 * @throws Exception
-	 */
-	void loadBeanDefinitions(String location) throws Exception;
+    /**
+     * 加载bean定义到内存
+     *
+     * @param location bean的地址
+     * @throws Exception
+     */
+    void loadBeanDefinitions(String location) throws Exception;
 }

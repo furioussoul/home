@@ -1,11 +1,5 @@
 package utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 public class MBG {
 //    public static void main (String [] argo0) throws SQLException, IOException, InterruptedException, XMLParserException, InvalidConfigurationException{
 //        List<String> warnings = new ArrayList<String>();

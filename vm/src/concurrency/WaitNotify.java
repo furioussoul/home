@@ -3,7 +3,6 @@ package concurrency;
 import org.junit.Test;
 import utils.SystemPrinter;
 
-import java.sql.Time;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -12,6 +11,16 @@ import java.util.concurrent.TimeUnit;
  * Created by szj on 2016/7/9.
  */
 public class WaitNotify {
+
+    @Test
+    public void main() throws InterruptedException {
+        Car car = new Car();
+        ExecutorService exec = Executors.newCachedThreadPool();
+        exec.execute(new WaxOff(car));
+        exec.execute(new WaxOn(car));
+        TimeUnit.SECONDS.sleep(5);
+        exec.shutdownNow();
+    }
 
     public static class Car {
         private boolean waxOn = false;
@@ -83,15 +92,5 @@ public class WaitNotify {
             }
             SystemPrinter.println("Ending wax off task");
         }
-    }
-
-    @Test
-    public void main() throws InterruptedException {
-        Car car = new Car();
-        ExecutorService exec = Executors.newCachedThreadPool();
-        exec.execute(new WaxOff(car));
-        exec.execute(new WaxOn(car));
-        TimeUnit.SECONDS.sleep(5);
-        exec.shutdownNow();
     }
 }

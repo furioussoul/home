@@ -5,5 +5,6 @@ package designPattern.adapter;
  */
 public interface Adapter {
     boolean supports(Object controller);
+
     void handle(Object controller);
 }

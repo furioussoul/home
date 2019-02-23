@@ -18,7 +18,7 @@ public class BinaryAdd {
     @Test
     public void add() {
         int index = x1.length - 1;
-        //cal from input arrays' last index
+        //start from input arrays' last index
         while (index > -1) {
             cal(index);
             index--;
@@ -31,19 +31,17 @@ public class BinaryAdd {
     }
 
     public void cal(int index) {
-        int i = index;
-        //try to add one byte
-        int temp1 = x1[i];
-        int temp2 = x2[i];
-        if (temp1 + temp2 > 1) {
-            x3.add(temp1 + temp2 - 2);
-            if (index == 0) {
-                x3.add(1);
-                return;
-            }
-            x1[i - 1]++;
-        } else {
+        int temp1 = x1[index];
+        int temp2 = x2[index];
+        if (temp1 + temp2 <= 1) {
             x3.add(temp1 + temp2);
+            return;
         }
+        x3.add(temp1 + temp2 - 2);
+        if (index == 0) {
+            x3.add(1);
+            return;
+        }
+        x1[index - 1]++;
     }
 }

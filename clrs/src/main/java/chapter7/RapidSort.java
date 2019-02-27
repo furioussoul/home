@@ -28,17 +28,20 @@ public class RapidSort {
     //return index which sort[0-index] <= sort[index] <= sort[index-last]
     private int partition(int[] sort, int p, int r) {
         int temp;
-        int x = sort[r];
         int i = p - 1;
-        //smaller before i, bigger btween i and j
+        //smaller before i, bigger between i and j
         for (int k = p; k < r; k++) {
-            if (sort[k] <= x) {
+            if (sort[k] <= sort[r]) {
                 i++;
+
+                //k和i换
                 temp = sort[k];
                 sort[k] = sort[i];
                 sort[i] = temp;
             }
         }
+
+        //r和i+1换
         temp = sort[r];
         sort[r] = sort[i + 1];
         sort[i + 1] = temp;

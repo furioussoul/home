@@ -10,7 +10,7 @@ public class HeapSort {
 
     private static int MIN_QUEUE_TYPE = 1; // 最小堆
     private static int MAX_QUEUE_TYPE = 2; // 最大堆
-    private int[] origin = {9, 0, 8, 100, 6, 5, 4, 11, 2, 1};
+    private int[] origin = {9, 0, 8, 1, 6, 5, 4, 11, 2, 101,111,222};
 
     @Test
     public void buildMax() {
@@ -68,24 +68,24 @@ public class HeapSort {
     }
 
     public void maxHeapify(int index) {
-        int leftSonIndex = left(index);
-        int rightSonIndex = right(index);
-        int largestIndex = index;
-        if (leftSonIndex < origin.length
-                && origin[index] < origin[leftSonIndex]) {
-            largestIndex = leftSonIndex;
+        int l = left(index);
+        int r = right(index);
+        int m = index;
+        if (l < origin.length
+                && origin[index] < origin[l]) {
+            m = l;
         }
-        if (rightSonIndex < origin.length
-                && origin[largestIndex] < origin[rightSonIndex]) {
-            largestIndex = rightSonIndex;
+        if (r < origin.length
+                && origin[m] < origin[r]) {
+            m = r;
         }
-        if (largestIndex == index) {
+        if (m == index) {
             return;
         }
         int temp = origin[index];
-        origin[index] = origin[largestIndex];
-        origin[largestIndex] = temp;
-        maxHeapify(largestIndex);
+        origin[index] = origin[m];
+        origin[m] = temp;
+        maxHeapify(m);
     }
 
     private int left(int index) {

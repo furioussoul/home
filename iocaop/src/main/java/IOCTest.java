@@ -4,6 +4,7 @@ import app.ClassPathXmlApplicationContext;
 import domain.Bird;
 import domain.Person;
 
+
 /**
  * 使用IOC容器可以让使用者不用关注类的实例化和之间的依赖关系，从容器中获取bean即可
  * Created by 孙证杰 on 2017/7/31.
@@ -54,4 +55,6 @@ public class IOCTest {
         tesAnnotation();
         tesAop();
     }
+
+
 }

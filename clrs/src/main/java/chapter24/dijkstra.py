@@ -47,8 +47,12 @@ vList = [False, v1, v2, v3, v4, v5, v6, v7]
 vSet = {v1, v2, v3, v4, v5, v6, v7}
 
 
-# 找到vList中dist最小的元素
-# 从vSet中删除它，并返回它
+# 找到vList中dist最小的元素。
+# 从vSet中删除它，并返回它。
+# set中有三种元素：返回值、比返回值的dist大的inf和有限值。
+# 显然从dist比v.dist大的顶点到v的距离不可能比v.dist还要小。
+# inf是未连接到的顶点，把它们看成一个inf块，显然不可能有某条路径到达inf块后又回到v的dist比v.dist小。
+# 所以v.dist一定是从s到v的最优路径距离。
 def get_min_dist_v():
     min_ = -1
     index = 0
@@ -71,7 +75,7 @@ def get_min_dist_v():
 if __name__ == '__main__':
 
     while len(vSet) != 0:
-        # 遍历每个顶点，v.dist一定是递增的
+        # 遍历每个顶点
         v = get_min_dist_v()
         # 计算v可达节点的dist
         for w in v.outList:

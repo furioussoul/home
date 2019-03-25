@@ -79,7 +79,7 @@ if __name__ == '__main__':
         v = get_min_dist_v()
         # 计算v可达节点的dist
         for w in v.outList:
-            if v.dist + edges[v.vid, w] < vList[w].dist:
+            if vList[w].know is False and v.dist + edges[v.vid, w] < vList[w].dist:
                 vList[w].dist = v.dist + edges[v.vid, w]
                 vList[w].prev = v.vid
 

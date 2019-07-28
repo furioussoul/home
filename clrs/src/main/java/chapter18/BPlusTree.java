@@ -131,20 +131,20 @@ public class BPlusTree <T, V extends Comparable<V>>{
          */
         @Override
         Node<T, V> insert(T value, V key) {
+
+
+            //找到带插入关键字的槽
             int i = 0;
             while(i < this.number){
                 if(key.compareTo((V) this.keys[i]) < 0)
                     break;
                 i++;
             }
-            if(key.compareTo((V) this.keys[this.number - 1]) >= 0) {
-                i--;
-//                if(this.childs[i].number + 1 <= bTreeOrder) {
-//                    this.keys[this.number - 1] = key;
-//                }
-            }
 
-//            System.out.println("非叶子节点查找key: " + this.keys[i]);
+            //待插入的关键字比该节点所有关键字都大，则插入到最后一个子树
+            if(i == this.number) {
+                i--;
+            }
 
             return this.childs[i].insert(value, key);
         }

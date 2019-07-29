@@ -101,7 +101,7 @@ public final class FileStreamStore {
     /**
      * Instantiate FileStreamStore
      *
-     * @param file name of file to open
+     * @param file       name of file to open
      * @param bufferSize for buffer to reduce context switching (minimal is 512bytes, recommended 64KBytes)
      */
     public FileStreamStore(final String file, final int bufferSize) {
@@ -111,7 +111,7 @@ public final class FileStreamStore {
     /**
      * Instantiate FileStreamStore
      *
-     * @param file file to open
+     * @param file       file to open
      * @param bufferSize for buffer to reduce context switching (minimal is 512bytes)
      */
     public FileStreamStore(final File file, final int bufferSize) {
@@ -458,63 +458,40 @@ public final class FileStreamStore {
     /**
      * Write from buf to file
      *
-     * @param buf    ByteBuffer to write
+     * @param buf ByteBuffer to write
      * @return long offset where buffer begin was write or -1 if error
      */
     public synchronized long write(final ByteBuffer buf) {
         if (!validState) {
             throw new InvalidStateException();
         }
-        final int packet_size = (HEADER_LEN + buf.limit() + FOOTER_LEN); // short + int + data + byte
-        final boolean useDirectIO = (packet_size > (1 << bits));
+
         try {
-            if (useDirectIO) {
-                log.warn("WARN: usingDirectIO packet size is greater (" + packet_size
-                        + ") than file buffer (" + bufOutput.capacity() + ")");
+            //padding 0 for align
+            final int packetSize = (HEADER_LEN + buf.limit() + FOOTER_LEN); // short + int + data + byte
+            final int diffOffset = nextBlockBoundary(offsetOutputUncommited);
+            if (alignBlocks && packetSize > diffOffset) {
+                alignBuffer(diffOffset);
+                offsetOutputUncommited += diffOffset;
             }
-            // Align output
-            if (alignBlocks && !useDirectIO) {
-                final int diffOffset = nextBlockBoundary(offsetOutputUncommited);
-                if (packet_size > diffOffset) {
-                    alignBuffer(diffOffset);
-                    offsetOutputUncommited += diffOffset;
-                }
-            }
-            // Remember current offset
-            final long offset = offsetOutputUncommited;
-            // Write pending buffered data to disk
+
             if (bufOutput.remaining() == 0) {
+                // write after padding
                 flushBuffer();
             }
+
             // Write new data to buffer
             bufOutput.put((byte) ((MAGIC >> 8) & 0xFF));    // Header - Magic (short, 2 bytes, msb-first)
             bufOutput.put((byte) (MAGIC & 0xFF));        // Header - Magic (short, 2 bytes, lsb-last)
             bufOutput.putInt(buf.limit());                // Header - Data Size (int, 4 bytes)
-            if (useDirectIO) {
-                bufOutput.flip();
-                fcOutput.write(new ByteBuffer[]{
-                        bufOutput, buf, ByteBuffer.wrap(new byte[]{
-                        MAGIC_FOOT
-                })
-                }); // Write Header + Data + Footer
-                bufOutput.clear();
-                offsetOutputUncommited = offsetOutputCommited = fcOutput.position();
-                if (syncOnFlush) {
-                    fcOutput.force(false);
-                    if (callback != null)
-                        callback.synched(offsetOutputCommited);
-                }
-            } else {
-                bufOutput.put(buf); // Data Body
-                bufOutput.put(MAGIC_FOOT); // Footer
-                // Increment offset of buffered data (header + user-data)
-                offsetOutputUncommited += packet_size;
-                if (flushOnWrite) {
-                    flushBuffer();
-                }
-            }
-            //
-            return offset;
+
+            bufOutput.put(buf); // Data Body
+            bufOutput.put(MAGIC_FOOT); // Footer
+            // Increment offset of buffered data (header + user-data)
+            offsetOutputUncommited += packetSize;
+
+            return offsetOutputUncommited;
+
         } catch (Exception e) {
             log.error("Exception in write()", e);
         }

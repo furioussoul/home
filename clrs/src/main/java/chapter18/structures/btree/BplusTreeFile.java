@@ -614,7 +614,7 @@ public final class BplusTreeFile<K extends DataHolder<K>, V extends DataHolder<V
             return false;
         }
         final ByteBuffer buf = bufstack.pop();
-        final long tsbegin = System.currentTimeMillis();
+        final long tsBegin = System.currentTimeMillis();
         // Try to read Redo Meta Sync State to choose recovery mode
         boolean recoveryIncremental = false;
         if (!forceFullRecovery) {
@@ -622,8 +622,9 @@ public final class BplusTreeFile<K extends DataHolder<K>, V extends DataHolder<V
             if (redoStore.isEmpty()) {
                 recoveryIncremental = true;
             } else if (redoStore.readFromEnd(4, buf) < 0) {
-                if (redoStore.isValid())
+                if (redoStore.isValid()) {
                     recoveryIncremental = true;
+                }
             } else {
                 final int head = buf.get();
                 final int value1 = buf.get();
@@ -635,14 +636,14 @@ public final class BplusTreeFile<K extends DataHolder<K>, V extends DataHolder<V
             }
         }
         log.info(recoveryIncremental ? "Incremental Recovery Allowed" : "Full Recovery Needed");
-        //
+
         final boolean oldUseRedo = useRedo;
         final K factoryK = factoryK();
         final V factoryV = factoryV();
         BplusTreeFile<K, V> treeTmp = null;
         if (recoveryIncremental) {
             log.info("Recovery in Incremental Mode (Replay Redo)");
-            //
+
             treeTmp = this;
             useRedo = false;    // HACK (don't call setUseRedo, destructive)
             validState = true;    // HACK
@@ -721,7 +722,7 @@ public final class BplusTreeFile<K extends DataHolder<K>, V extends DataHolder<V
         //
         if (recoveryIncremental) {
             useRedo = oldUseRedo;    // HACK (don't call setUseRedo, destructive)
-            log.info("Incremental Recovery completed time=" + (System.currentTimeMillis() - tsbegin) + "ms");
+            log.info("Incremental Recovery completed time=" + (System.currentTimeMillis() - tsBegin) + "ms");
             return true;
         }
         // Rename data files
@@ -735,10 +736,10 @@ public final class BplusTreeFile<K extends DataHolder<K>, V extends DataHolder<V
             treeTmp.fileFreeBlocks.delete();
             // Remove broken free blocks
             fileFreeBlocks.delete();
-            log.info("Full Recovery completed time=" + (System.currentTimeMillis() - tsbegin) + "ms");
+            log.info("Full Recovery completed time=" + (System.currentTimeMillis() - tsBegin) + "ms");
             return true;
         }
-        log.info("Full Recovery failed time=" + (System.currentTimeMillis() - tsbegin) + "ms");
+        log.info("Full Recovery failed time=" + (System.currentTimeMillis() - tsBegin) + "ms");
         return false;
     }
 

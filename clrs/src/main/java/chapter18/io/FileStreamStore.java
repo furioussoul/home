@@ -36,6 +36,7 @@ public final class FileStreamStore {
     private final static byte MAGIC_FOOT = 0x24;
     private static final int HEADER_LEN = 6;
     private static final int FOOTER_LEN = 1;
+    private static final int DEFAULT_BUF_SIZE = 512;
     /**
      * Size/Power-of-2 for size of buffers/align
      * ^9=512 ^12=4096 ^16=65536
@@ -52,11 +53,11 @@ public final class FileStreamStore {
     /**
      * File associated to this store
      */
-    private File file = null;
+    private File file;
     /**
-     * RamdomAccessFile for Input this store
+     * RandomAccessFile for Input this store
      */
-    private RandomAccessFile rafInput = null;
+    private RandomAccessFile rdfInput = null;
     /**
      * FileChannel for Input this store
      */
@@ -70,13 +71,13 @@ public final class FileStreamStore {
      */
     private FileChannel fcOutput = null;
     /**
-     * Current output offset for blocks (commited to disk)
+     * Current output offset for blocks (Committed to disk)
      */
-    private long offsetOutputCommited = 0;
+    private long offsetOutputCommitted = 0;
     /**
-     * Current output offset for blocks (uncommited to disk)
+     * Current output offset for blocks (Uncommitted to disk)
      */
-    private long offsetOutputUncommited = 0;
+    private long offsetOutputUncommitted = 0;
     /**
      * In Valid State?
      */
@@ -86,7 +87,7 @@ public final class FileStreamStore {
      */
     private boolean flushOnWrite = false;
     /**
-     * sync to disk on flushbuffer?
+     * sync to disk on flushBuffer?
      */
     private boolean syncOnFlush = true;
     /**
@@ -116,12 +117,12 @@ public final class FileStreamStore {
      */
     public FileStreamStore(final File file, final int bufferSize) {
         this.file = file;
-        this.bits = ((int) Math.ceil(Math.log(Math.max(bufferSize, 512)) / Math.log(2))); // round power of 2
-        this.bufInput = ByteBuffer.allocate(512); // default HDD sector size
+        // round power of 2
+        this.bits = ((int) Math.ceil(Math.log(Math.max(bufferSize, DEFAULT_BUF_SIZE)) / Math.log(2)));
+        // default HDD sector size
+        this.bufInput = ByteBuffer.allocate(DEFAULT_BUF_SIZE);
         this.bufOutput = ByteBuffer.allocate(1 << bits);
     }
-
-    // ========= Open / Close =========
 
     /**
      * Open file for read/write
@@ -150,17 +151,18 @@ public final class FileStreamStore {
                 osOutput = new FileOutputStream(file, true);
                 fcOutput = osOutput.getChannel();
             }
-            rafInput = new RandomAccessFile(file, "r");
-            fcInput = rafInput.getChannel();
+            rdfInput = new RandomAccessFile(file, "r");
+            fcInput = rdfInput.getChannel();
             if (readOnly) {
                 fcOutput = fcInput;
             }
-            offsetOutputUncommited = offsetOutputCommited = fcOutput.size();
+            offsetOutputUncommitted = offsetOutputCommitted = fcOutput.size();
         } catch (Exception e) {
             log.error("Exception in open()", e);
             try {
                 close();
             } catch (Exception ign) {
+                // should't happen
             }
         }
         validState = isOpen();
@@ -177,52 +179,43 @@ public final class FileStreamStore {
         try {
             fcInput.close();
         } catch (Exception ign) {
+            //
         }
         try {
-            rafInput.close();
+            rdfInput.close();
         } catch (Exception ign) {
+            //
         }
         try {
             osOutput.close();
         } catch (Exception ign) {
+            //
         }
         try {
             fcOutput.close();
         } catch (Exception ign) {
+            //
         }
-        rafInput = null;
+        rdfInput = null;
         fcInput = null;
         osOutput = null;
         fcOutput = null;
-        //
+
         validState = false;
     }
-
-    // ========= Info =========
 
     /**
      * @return true if file is open
      */
     public synchronized boolean isOpen() {
-        try {
-            if ((fcInput != null) && (fcOutput != null)) {
-                return (fcInput.isOpen() && fcOutput.isOpen());
-            }
-        } catch (Exception ign) {
-        }
-        return false;
+        return (fcInput != null) && (fcOutput != null) && (fcInput.isOpen() && fcOutput.isOpen());
     }
 
     /**
      * @return size of file in bytes
      */
     public synchronized long size() {
-        try {
-            return (file.length() + bufOutput.position());
-        } catch (Exception e) {
-            log.error("Exception in size()", e);
-        }
-        return -1;
+        return file.length() + bufOutput.position();
     }
 
     /**
@@ -234,7 +227,7 @@ public final class FileStreamStore {
         if (!validState) {
             throw new InvalidStateException();
         }
-        return (size() == 0);
+        return size() == 0;
     }
 
     /**
@@ -255,7 +248,7 @@ public final class FileStreamStore {
             if (offset < 0) {
                 return false;
             }
-            if (offset >= offsetOutputCommited) {
+            if (offset >= offsetOutputCommitted) {
                 if (bufOutput.position() > 0) {
                     log.warn("WARN: autoflush forced");
                     flushBuffer();
@@ -281,8 +274,6 @@ public final class FileStreamStore {
         return false;
     }
 
-    // ========= Destroy =========
-
     /**
      * Truncate file
      */
@@ -293,9 +284,9 @@ public final class FileStreamStore {
         try {
             bufOutput.clear();
             fcOutput.position(0).truncate(0).force(true);
-            offsetOutputUncommited = offsetOutputCommited = fcOutput.position();
+            offsetOutputUncommitted = offsetOutputCommitted = fcOutput.position();
             if (callback != null) {
-                callback.synched(offsetOutputCommited);
+                callback.synched(offsetOutputCommitted);
             }
             close();
             open();
@@ -357,34 +348,34 @@ public final class FileStreamStore {
     /**
      * Read desired block of datalen from end of file
      *
-     * @param datalen    expected
-     * @param buf
+     * @param dataLen expected
+     * @param dest
      * @return new offset (offset+headerlen+datalen+footer)
      */
-    public synchronized long readFromEnd(final long datalen, final ByteBuffer buf) {
+    public synchronized long readFromEnd(final long dataLen, final ByteBuffer dest) {
         if (!validState) {
             throw new InvalidStateException();
         }
         final long size = size();
-        final long offset = (size - HEADER_LEN - datalen - FOOTER_LEN);
-        return read(offset, buf);
+        final long offset = (size - HEADER_LEN - dataLen - FOOTER_LEN);
+        return read(offset, dest);
     }
 
     /**
      * Read block from file
      *
-     * @param offset     of block
-     * @param buf
+     * @param offset of block
+     * @param dest
      * @return new offset (offset+headerlen+datalen+footer)
      */
-    public synchronized long read(long offset, final ByteBuffer buf) {
+    public synchronized long read(long offset, final ByteBuffer dest) {
         if (!validState) {
             throw new InvalidStateException();
         }
         try {
             int readed;
             while (true) {
-                if (offset >= offsetOutputCommited) {
+                if (offset >= offsetOutputCommitted) {
                     if (bufOutput.position() > 0) {
                         log.warn("WARN: autoflush forced");
                         flushBuffer();
@@ -422,10 +413,10 @@ public final class FileStreamStore {
                 footer = bufInput.get(datalen + HEADER_LEN);    // Footer (byte)
             }
             bufInput.limit(Math.min(readed, datalen + HEADER_LEN));
-            buf.put(bufInput);
+            dest.put(bufInput);
             if (dataUnderFlow > 0) {
-                buf.limit(datalen);
-                int len = fcInput.read(buf);
+                dest.limit(datalen);
+                int len = fcInput.read(dest);
                 if (len < dataUnderFlow) {
                     log.error("Unable to read payload readed=" + len + " expected=" + dataUnderFlow);
                     return -1;
@@ -446,7 +437,7 @@ public final class FileStreamStore {
                         + Integer.toHexString(MAGIC_FOOT));
                 return -1;
             }
-            buf.flip();
+            dest.flip();
             return (offset + HEADER_LEN + datalen + FOOTER_LEN);
         } catch (Exception e) {
             log.error("Exception in read(" + offset + ")", e);
@@ -468,10 +459,10 @@ public final class FileStreamStore {
         try {
             //padding 0 for align
             final int packetSize = (HEADER_LEN + buf.limit() + FOOTER_LEN); // short + int + data + byte
-            final int diffOffset = nextBlockBoundary(offsetOutputUncommited);
+            final int diffOffset = nextBlockBoundary(offsetOutputUncommitted);
             if (alignBlocks && packetSize > diffOffset) {
                 alignBuffer(diffOffset);
-                offsetOutputUncommited += diffOffset;
+                offsetOutputUncommitted += diffOffset;
             }
 
             if (bufOutput.remaining() == 0) {
@@ -487,9 +478,9 @@ public final class FileStreamStore {
             bufOutput.put(buf); // Data Body
             bufOutput.put(MAGIC_FOOT); // Footer
             // Increment offset of buffered data (header + user-data)
-            offsetOutputUncommited += packetSize;
+            offsetOutputUncommitted += packetSize;
 
-            return offsetOutputUncommited;
+            return offsetOutputUncommitted;
 
         } catch (Exception e) {
             log.error("Exception in write()", e);
@@ -528,10 +519,14 @@ public final class FileStreamStore {
         switch (diff - i) {
             case 3:
                 bufOutput.put((byte) 0);
+                break;
             case 2:
                 bufOutput.putShort((short) 0);
                 break;
             case 1:
+                bufOutput.put((byte) 0);
+                break;
+            default:
                 bufOutput.put((byte) 0);
         }
     }
@@ -555,7 +550,7 @@ public final class FileStreamStore {
     }
 
     /**
-     * Write uncommited data to disk
+     * Write uncommitted data to disk
      *
      * @throws IOException
      */
@@ -564,13 +559,11 @@ public final class FileStreamStore {
             bufOutput.flip();
             fcOutput.write(bufOutput);
             bufOutput.clear();
-            // log.debug("offsetOutputUncommited=" + offsetOutputUncommited + " offsetOutputCommited=" +
-            // offsetOutputCommited + " fcOutput.position()=" + fcOutput.position());
-            offsetOutputUncommited = offsetOutputCommited = fcOutput.position();
+            offsetOutputUncommitted = offsetOutputCommitted = fcOutput.position();
             if (syncOnFlush) {
                 fcOutput.force(false);
                 if (callback != null) {
-                    callback.synched(offsetOutputCommited);
+                    callback.synched(offsetOutputCommitted);
                 }
             }
         }
@@ -590,7 +583,7 @@ public final class FileStreamStore {
             if (!syncOnFlush) {
                 fcOutput.force(false);
                 if (callback != null) {
-                    callback.synched(offsetOutputCommited);
+                    callback.synched(offsetOutputCommitted);
                 }
             }
             return true;

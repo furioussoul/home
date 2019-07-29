@@ -35,6 +35,10 @@ public abstract class Node<K extends DataHolder<K>, V extends DataHolder<V>> {
     public final K[] keys;
 
     public int id = Node.NULL_ID;
+
+    /**
+     * guess allocated key number
+     */
     public int allocated = 0;
 
     protected Node(final BplusTree<K, V> tree) {
@@ -68,7 +72,7 @@ public abstract class Node<K extends DataHolder<K>, V extends DataHolder<V>> {
     /**
      * Searches using the binary search algorithm. {@link Arrays#binarySearch(Object[], int, int, Object)}
      *
-     * @param key the value to be searched for
+     * @param searchKey the value to be searched for
      * @return index of the search key, if it is contained in the array
      * within the specified range;
      * otherwise, <tt>(-(<i>insertion point</i>) - 1)</tt>. The

@@ -215,7 +215,6 @@ public final class FileStreamStore {
 
     /**
      * @return size of file in bytes
-     * @see #getBlockSize()
      */
     public synchronized long size() {
         try {
@@ -359,7 +358,7 @@ public final class FileStreamStore {
      * Read desired block of datalen from end of file
      *
      * @param datalen    expected
-     * @param ByteBuffer
+     * @param buf
      * @return new offset (offset+headerlen+datalen+footer)
      */
     public synchronized long readFromEnd(final long datalen, final ByteBuffer buf) {
@@ -375,7 +374,7 @@ public final class FileStreamStore {
      * Read block from file
      *
      * @param offset     of block
-     * @param ByteBuffer
+     * @param buf
      * @return new offset (offset+headerlen+datalen+footer)
      */
     public synchronized long read(long offset, final ByteBuffer buf) {

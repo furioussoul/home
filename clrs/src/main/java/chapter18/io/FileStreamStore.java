@@ -102,7 +102,7 @@ public final class FileStreamStore {
      * Instantiate FileStreamStore
      *
      * @param file name of file to open
-     * @param size for buffer to reduce context switching (minimal is 512bytes, recommended 64KBytes)
+     * @param bufferSize for buffer to reduce context switching (minimal is 512bytes, recommended 64KBytes)
      */
     public FileStreamStore(final String file, final int bufferSize) {
         this(new File(file), bufferSize);
@@ -112,7 +112,7 @@ public final class FileStreamStore {
      * Instantiate FileStreamStore
      *
      * @param file file to open
-     * @param size for buffer to reduce context switching (minimal is 512bytes)
+     * @param bufferSize for buffer to reduce context switching (minimal is 512bytes)
      */
     public FileStreamStore(final File file, final int bufferSize) {
         this.file = file;
@@ -458,7 +458,6 @@ public final class FileStreamStore {
     /**
      * Write from buf to file
      *
-     * @param offset of block
      * @param buf    ByteBuffer to write
      * @return long offset where buffer begin was write or -1 if error
      */
@@ -477,9 +476,6 @@ public final class FileStreamStore {
             if (alignBlocks && !useDirectIO) {
                 final int diffOffset = nextBlockBoundary(offsetOutputUncommited);
                 if (packet_size > diffOffset) {
-                    // log.warn("WARN: aligning offset=" + offsetOutputUncommited + " to=" +
-                    // (offsetOutputUncommited+diffOffset) + " needed=" + packet_size + " allowed=" +
-                    // diffOffset);
                     alignBuffer(diffOffset);
                     offsetOutputUncommited += diffOffset;
                 }
@@ -487,7 +483,7 @@ public final class FileStreamStore {
             // Remember current offset
             final long offset = offsetOutputUncommited;
             // Write pending buffered data to disk
-            if (bufOutput.remaining() < packet_size) {
+            if (bufOutput.remaining() == 0) {
                 flushBuffer();
             }
             // Write new data to buffer

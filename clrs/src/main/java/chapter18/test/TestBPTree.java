@@ -29,7 +29,7 @@ public class TestBPTree {
         long data = 314;
         int insert = 1;
 
-        int leafsLeastKeyAfterSplit = bpTree.leaf_split_left(leaf, left, key, data, insert);
+        int leafsLeastKeyAfterSplit = bpTree.leafSplitLeft(leaf, left, key, data, insert);
         System.out.println(leafsLeastKeyAfterSplit);
     }
 }

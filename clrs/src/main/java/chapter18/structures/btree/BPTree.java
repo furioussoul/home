@@ -87,7 +87,7 @@ public class BPTree implements Itree {
         root.incrementChildren();
 
         this.incrementLevel();
-        nodeFlush(root);
+        flushNode(root);
 
         return root;
     }
@@ -105,10 +105,29 @@ public class BPTree implements Itree {
         if (prev != null) {
             prev.setNext(left);
             left.setPrev(prev);
-            nodeFlush(prev);
+            flushNode(prev);
         }
         left.setNext(node);
         node.setPrev(left);
+    }
+
+    /**
+     * add right to node's left
+     * [node]-[right]-[next]
+     *
+     * @param node
+     * @param right
+     */
+    void addRightNode(INode node, INode right) {
+
+        INode next = node.getNext();
+        if (next != null) {
+            next.setPrev(right);
+            right.setNext(next);
+            flushNode(next);
+        }
+        right.setPrev(node);
+        node.setNext(right);
     }
 
     private INode node_fetch(int blockIndex) {
@@ -119,7 +138,7 @@ public class BPTree implements Itree {
     private void updateSubNode(INode parent, int index, INode subNode) {
         parent.children()[index] = subNode;
         subNode.setParent(parent);
-        nodeFlush(subNode);
+        flushNode(subNode);
     }
 
     private INode delete(int key, long data) {
@@ -152,40 +171,45 @@ public class BPTree implements Itree {
 
         int insertIndex = keyBinarySearch(leaf, key);
         if (insertIndex >= 0) {
-            /* Already exists */
             return null;
         }
 
         insertIndex = -insertIndex - 1;
 
         if (leaf.isFull()) {
-            int split_key = -1;
-            /* split = [m/2] */
+
             int midIndex = (maxOrder + 1) / 2;
             INode sibling = newLeaf();
 
-            /* sibling leaf replication due to location of insertion */
             if (insertIndex < midIndex) {
-                split_key = leaf_split_left(leaf, sibling, key, data, insertIndex);
+                int splitKey = leafSplitLeft(leaf, sibling, key, data, insertIndex);
+                return buildParentNode(sibling, leaf, splitKey);
+
             } else {
-//                split_key = leaf_split_right(leaf, sibling, key, data, insertIndex);
+                int splitKey = leafSplitRight(leaf, sibling, key, data, insertIndex);
+                return buildParentNode(leaf, sibling, splitKey);
+
             }
 
-            /* build new parent */
-            if (insertIndex < midIndex) {
-//                return parent_node_build(sibling, leaf, split_key);
-            } else {
-//                return parent_node_build(leaf, sibling, split_key);
-            }
         } else {
-//            leaf_simple_insert(tree, leaf, key, data, insertIndex);
-//            node_flush(tree, leaf);
+            simpleLeafInsert(leaf, key, data, insertIndex);
+            flushNode(leaf);
         }
 
-        return null;
+        return leaf;
     }
 
-    public int leaf_split_left(INode leaf, INode left, int key, long data, int insert) {
+    private void simpleLeafInsert(INode leaf, int key, long data, int insert) {
+        System.arraycopy(leaf.keys(), insert, leaf.keys(), insert + 1, leaf.childrenSize() - insert);
+        System.arraycopy(leaf.data(), insert, leaf.data(), insert + 1, leaf.childrenSize() - insert);
+
+        leaf.keys()[insert] = key;
+        leaf.data()[insert] = data;
+
+        leaf.incrementChildren();
+    }
+
+    public int leafSplitLeft(INode leaf, INode left, int key, long data, int insert) {
 
         int midIndex = (leaf.childrenSize() + 1) / 2;
 
@@ -219,6 +243,33 @@ public class BPTree implements Itree {
 
         return leaf.keys()[0];
     }
+
+    private int leafSplitRight(INode leaf, INode right, int key, long data, int insert) {
+
+        int midIndex = (leaf.childrenSize() + 1) / 2;
+
+        addRightNode(leaf, right);
+
+        right.setChildrenSize(maxOrder - midIndex + 1);
+        leaf.setChildrenSize(midIndex);
+
+        int pivot = insert - midIndex;
+
+        System.arraycopy(leaf.keys(), midIndex, right.keys(), 0, pivot);
+        System.arraycopy(leaf.data(), midIndex, right.data(), 0, pivot);
+
+        right.keys()[pivot] = key;
+        right.data()[pivot] = data;
+
+        /**
+         * copy high elements to right,so that don't need mv self'e elements
+         */
+        System.arraycopy(leaf.keys(), insert, right.keys(), pivot + 1, maxOrder - insert);
+        System.arraycopy(leaf.data(), insert, right.data(), pivot + 1, maxOrder - insert);
+
+        return right.keys()[0];
+    }
+
 
     private INode newLeaf() {
         INode node = newNode();
@@ -256,15 +307,15 @@ public class BPTree implements Itree {
 
         parent.setChild(index, subNode);
         subNode.setParent(parent);
-        nodeFlush(subNode);
+        flushNode(subNode);
     }
 
     private void subNodeFlush(INode parent, INode subNode) {
         subNode.setParent(parent);
-        nodeFlush(subNode);
+        flushNode(subNode);
     }
 
-    private void nodeFlush(INode node) {
+    private void flushNode(INode node) {
 
         final FileBlockStore.WriteBuffer wbuf = storage.set(ID.incrementAndGet());
         final ByteBuffer buf = wbuf.buf();
@@ -275,31 +326,16 @@ public class BPTree implements Itree {
         storage.sync();
     }
 
-    void leftNodeAdd(INode node, INode left) {
 
-        INode prev = node.getPrev();
-        if (prev != null) {
-            prev.setNext(left);
-            left.setPrev(prev);
-            nodeFlush(prev);
-        }
-        left.setNext(node);
-        node.setPrev(left);
-    }
-
-    void rightNodeAdd(INode node, INode right) {
-
-        INode next = node.getNext();
-        if (next != null) {
-            next.setPrev(right);
-            right.setNext(next);
-            nodeFlush(next);
-        }
-        right.setPrev(node);
-        node.setNext(right);
-    }
-
-    private int parent_node_build(INode leftChild, INode rightChild, int key) {
+    /**
+     * build parent node for leftChild and rightChild
+     *
+     * @param leftChild
+     * @param rightChild
+     * @param key
+     * @return
+     */
+    private INode buildParentNode(INode leftChild, INode rightChild, int key) {
         if (leftChild.parent() == null && rightChild.parent() == null) {
             /* new parent */
             INode parent = newInternalNode();
@@ -313,103 +349,89 @@ public class BPTree implements Itree {
 
             this.incrementLevel();
 
-            nodeFlush(leftChild);
-            nodeFlush(rightChild);
-            nodeFlush(parent);
-            return 0;
+            flushNode(leftChild);
+            flushNode(rightChild);
+            flushNode(parent);
+            return parent;
 
         } else if (rightChild.parent() == null) {
-            return non_leaf_insert(leftChild.parent(), leftChild, rightChild, key);
+            return internalNodeInsert(leftChild.parent(), leftChild, rightChild, key);
         } else {
-            return non_leaf_insert(rightChild.parent(), leftChild, rightChild, key);
+            return internalNodeInsert(rightChild.parent(), leftChild, rightChild, key);
         }
     }
 
-    private int non_leaf_insert(INode node, INode l_ch, INode r_ch, int key) {
+    private INode internalNodeInsert(INode parent, INode leftChild, INode rightChild, int key) {
 
-        int insertIndex = keyBinarySearch(node, key);
+        int insertIndex = keyBinarySearch(parent, key);
         insertIndex = -insertIndex - 1;
 
-        /* node is full */
-        if (node.childrenSize() == maxOrder) {
+        if (parent.isFull()) {
             int splitKey = -1;
-            /* split = [m/2] 向上取整*/
-            int midIndex = (node.childrenSize() + 1) / 2;
+
+            int midIndex = (parent.childrenSize() + 1) / 2;
+
             INode sibling = newInternalNode();
+
             if (insertIndex < midIndex) {
-                splitKey = non_leaf_split_left(node, sibling, l_ch, r_ch, key, insertIndex);
-            } else if (insertIndex == midIndex) {
-//                splitKey = non_leaf_split_right1(node, sibling, l_ch, r_ch, key, insertIndex);
+
+                splitKey = internalNodeSplitLeft(parent, sibling, leftChild, rightChild, key, insertIndex);
+                return buildParentNode(sibling, parent, splitKey);
+
             } else {
-//                splitKey = non_leaf_split_right2(node, sibling, l_ch, r_ch, key, insertIndex);
+                if (insertIndex == midIndex) {
+                    splitKey = non_leaf_split_right1(node, sibling, l_ch, rightChild, key, insertIndex);
+                } else {
+                    splitKey = non_leaf_split_right2(node, sibling, l_ch, rightChild, key, insertIndex);
+                }
+                return buildParentNode(parent, sibling, splitKey);
             }
 
-            /* build new parent */
-            if (insertIndex < midIndex) {
-                return parent_node_build(sibling, node, splitKey);
-            } else {
-                return parent_node_build(node, sibling, splitKey);
-            }
         } else {
-            non_leaf_simple_insert(node, l_ch, r_ch, key, insertIndex);
-            nodeFlush(node);
+            non_leaf_simple_insert(parent, leftChild, rightChild, key, insertIndex);
+            flushNode(parent);
         }
         return 0;
     }
 
-    private int non_leaf_split_left(INode node, INode left, INode l_ch, INode r_ch, int key, int insert) {
+    private int internalNodeSplitLeft(INode parent, INode left, INode leftChild, INode rightChild, int key, int insert) {
 
-        /* split = [m/2] */
         int split = (maxOrder + 1) / 2;
 
-        /* split as left sibling */
-        addLeftNode(node, left);
+        addLeftNode(parent, left);
 
-        /* calculate split nodes' children (sum as (order + 1))*/
         left.setChildrenSize(split);
-        node.setChildrenSize(maxOrder - split + 1);
+        parent.setChildrenSize(maxOrder - split + 1);
 
-        /* sum = left->children = pivot + (split - pivot - 1) + 1 */
-        /* replicate from key[0] to key[insert] in original node */
-   /*     memmove( & key(left)[0], &key(node)[0], pivot * sizeof(key_t));
-        memmove( & sub(left)[0], &sub(node)[0], pivot * sizeof(off_t));*/
 
-        /**
-         * move 0~pivot object from node to left
-         */
-        System.arraycopy(node.keys(), 0, left.keys(), 0, insert);
-        System.arraycopy(node.children(), 0, left.children(), 0, insert);
+        System.arraycopy(parent.keys(), 0, left.keys(), 0, insert);
+        System.arraycopy(parent.children(), 0, left.children(), 0, insert);
 
-        /* replicate from key[insert] to key[split - 1] in original node */
- /*       memmove( & key(left)[pivot + 1], &key(node)[pivot], (split - pivot - 1) * sizeof(key_t));
-        memmove( & sub(left)[pivot + 1], &sub(node)[pivot], (split - pivot - 1) * sizeof(off_t));
-*/
-        System.arraycopy(node.keys(), insert, left.keys(), insert + 1, split - insert - 1);
-        System.arraycopy(node.children(), insert, left.children(), insert + 1, split - insert - 1);
+        left.keys()[insert] = key;
 
-        /* flush sub-nodes of the new splitted left node */
+        System.arraycopy(parent.keys(), insert, left.keys(), insert + 1, split - insert - 1);
+        System.arraycopy(parent.children(), insert, left.children(), insert + 1, split - insert - 1);
+
         for (int i = 0; i < left.childrenSize(); i++) {
             if (i != insert && i != insert + 1) {
                 subNodeFlush(left, left.children()[i]);
             }
         }
 
-        /* insert new key and sub-nodes and locate the split key */
-        left.keys()[insert] = key;
 
-        int split_key;
+        int splitKey;
 
         if (insert == split - 1) {
             /* left child in split left node and right child in original right one */
-            sub_node_update(left, insert, l_ch);
-            sub_node_update(node, 0, r_ch);
-            split_key = key;
+            sub_node_update(left, insert, leftChild);
+            sub_node_update(parent, 0, rightChild);
+            splitKey = key;
         } else {
             /* both new children in split left node */
-            sub_node_update(left, insert, l_ch);
-            sub_node_update(left, insert + 1, r_ch);
-            node.data()[0] = node.keys()[split - 1];
-            split_key = node.keys()[split - 2];
+            sub_node_update(left, insert, leftChild);
+            sub_node_update(left, insert + 1, rightChild);
+            parent.data()[0] = parent.keys()[split - 1];
+            splitKey = parent.keys()[split - 2];
         }
 
         /* sum = node->children = 1 + (node->children - 1) */
@@ -417,10 +439,10 @@ public class BPTree implements Itree {
       /*  memmove( & key(node)[0], &key(node)[split - 1], (node -> children - 1) * sizeof(key_t));
         memmove( & sub(node)[1], &sub(node)[split], (node -> children - 1) * sizeof(off_t));
 */
-        System.arraycopy(node.keys(), insert, node.keys(), split - 1, node.childrenSize() - 1);
-        System.arraycopy(node.data(), insert, node.data(), split, node.childrenSize() - 1);
+        System.arraycopy(parent.keys(), split - 1, parent.keys(), 0, parent.childrenSize() - 1);
+        System.arraycopy(parent.children(), split, parent.children(), 1, parent.childrenSize() - 1);
 
-        return split_key;
+        return splitKey;
     }
 
  /*   static key_t non_leaf_split_right1(struct bplus_tree *tree, struct bplus_node *node,
@@ -519,7 +541,7 @@ public class BPTree implements Itree {
     private void sub_node_update(INode parent, int index, INode subNode) {
         parent.children()[index] = subNode;
         subNode.setParent(parent);
-        nodeFlush(subNode);
+        flushNode(subNode);
     }
 
     private INode newInternalNode() {

@@ -4,17 +4,20 @@ public interface Itree {
 
     void dump();
     long get(int key);
-    int put(int key, long data);
+
+    INode put(int key, long data);
     long rangeGet(int key1, int key2);
     Itree init(String filename, int blockSize);
     void destroy();
     int openFile(String filename);
     void closeFile(int fd);
 
-    void initList(Link link);
-    INode seek(INode node);
+    int incrementLevel();
 
-    public static class Link {
+    int allocNodeId(final boolean isLeaf);
+    void initList(Link link);
+
+    class Link {
         Link prev;
         Link next;
     }

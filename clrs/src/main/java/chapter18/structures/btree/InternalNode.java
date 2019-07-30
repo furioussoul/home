@@ -218,7 +218,7 @@ public final class InternalNode<K extends DataHolder<K>, V extends DataHolder<V>
         // make space for new keys in nodeTO
         System.arraycopy(nodeTO.keys, 0, nodeTO.keys, shift, sizeTO);
         System.arraycopy(nodeTO.childs, 0, nodeTO.childs, shift, sizeTO + 1);
-        // move keys and children out of nodeFROM and into nodeTO (and nodeU)
+        // move keys and childrenSize out of nodeFROM and into nodeTO (and nodeU)
         nodeTO.keys[shift - 1] = nodeParent.keys[slot];
         nodeParent.keys[slot] = nodeFROM.keys[sizeFROM - shift];
         System.arraycopy(nodeFROM.keys, sizeFROM - shift + 1, nodeTO.keys, 0, shift - 1);
@@ -237,12 +237,12 @@ public final class InternalNode<K extends DataHolder<K>, V extends DataHolder<V>
         final int sizeTO = nodeTO.allocated;
         final int sizeFROM = nodeFROM.allocated;
         final int shift = ((sizeTO + sizeFROM) / 2) - sizeTO;  // num. keys to shift from nodeFROM to nodeTO
-        // shift keys and children from nodeFROM to nodeTO
+        // shift keys and childrenSize from nodeFROM to nodeTO
         nodeTO.keys[sizeTO] = nodeParent.keys[slot];
         System.arraycopy(nodeFROM.keys, 0, nodeTO.keys, sizeTO + 1, shift - 1);
         System.arraycopy(nodeFROM.childs, 0, nodeTO.childs, sizeTO + 1, shift);
         nodeParent.keys[slot] = nodeFROM.keys[shift - 1];
-        // delete keys and children from nodeFROM
+        // delete keys and childrenSize from nodeFROM
         System.arraycopy(nodeFROM.keys, shift, nodeFROM.keys, 0, sizeFROM - shift);
         Arrays.fill(nodeFROM.keys, sizeFROM - shift, sizeFROM, null);
         System.arraycopy(nodeFROM.childs, shift, nodeFROM.childs, 0, sizeFROM - shift + 1);

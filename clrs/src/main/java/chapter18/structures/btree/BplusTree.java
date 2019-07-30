@@ -64,7 +64,7 @@ public abstract class BplusTree<K extends DataHolder<K>, V extends DataHolder<V>
 	 */
 	private final IntStack stackSlots = new IntStack(16, Node.NULL_ID);
 	/**
-	 * maximum number of children of a node (odd/impar number)
+	 * maximum number of childrenSize of a node (odd/impar number)
 	 * <p>
 	 * <i> Note: density of node minimal (b-order/2), average (b-order*2/3)
 	 */

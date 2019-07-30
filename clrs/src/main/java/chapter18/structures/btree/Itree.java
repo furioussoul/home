@@ -17,6 +17,8 @@ public interface Itree {
     int allocNodeId(final boolean isLeaf);
     void initList(Link link);
 
+    int maxOrder();
+
     class Link {
         Link prev;
         Link next;

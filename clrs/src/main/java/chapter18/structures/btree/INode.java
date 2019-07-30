@@ -10,14 +10,18 @@ public interface INode {
         return 1;
     }
 
+    void setKeys(int[] keys);
     int[] keys();
 
+    void setData(long[] data);
     long[] data();
 
     int childrenSize();
     INode[] children();
 
-    void incrementChildren(int size);
+    void setChildrenSize(int size);
+
+    void incrementChildren();
     int type();
 
     void setType(int type);
@@ -29,7 +33,17 @@ public interface INode {
 
     void setParent(INode parent);
 
+    INode getPrev();
+
+    void setPrev(INode prev);
+
+    INode getNext();
+
+    void setNext(INode next);
+
     INode parent();
+
+    boolean isFull();
 
     void serialize(final ByteBuffer buf);
 }

@@ -1,10 +1,10 @@
 package chapter18.structures.btree;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
 public interface INode {
 
+    int getNext();
     void setNext(int id);
     int id();
     void setId(int id);

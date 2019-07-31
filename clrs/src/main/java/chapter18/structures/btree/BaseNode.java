@@ -34,6 +34,11 @@ public class BaseNode implements INode {
     }
 
     @Override
+    public int getNext() {
+        return next;
+    }
+
+    @Override
     public void setNext(int id) {
         this.next = id;
     }

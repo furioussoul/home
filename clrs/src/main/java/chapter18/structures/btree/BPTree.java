@@ -6,6 +6,9 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -30,13 +33,45 @@ public class BPTree implements Itree {
     FileBlockStore storage;
 
     @Override
-    public long get(int k) {
+    public Message get(int k) {
 
         INode x = root;
         return get(x, k);
     }
 
-    private long get(INode x, int k) {
+
+    @Override
+    public Message rangeGet(int from, int to) {
+        Message message = get(root, from);
+        if (message == null) {
+            return null;
+        }
+        INode node = message.getNode();
+
+
+        List<Integer> keys = new LinkedList<>();
+        message.setKeys(keys);
+
+
+        do{
+            for (int i = 0; i < node.keySize(); i++) {
+                int key = node.getKey(i);
+                if(key>=from && key <= to){
+                    keys.add(key);
+                }
+                if (key > to) {
+                    return message;
+                }
+
+            }
+        }while ((node = readNodeById(node.getNext())) != null);
+
+
+        return message;
+    }
+
+
+    private Message get(INode x, int k) {
 
         int i = 0;
 
@@ -46,10 +81,16 @@ public class BPTree implements Itree {
 
         if (i < x.keySize() && k == x.getKey(i)) {
 
-            return x.getKey(i);
+            return new Message(x, i);
 
         } else if (x.isLeaf()) {
-            return -1;
+
+            if(k<x.getKey(0)){
+                return new Message(x, i);
+            }else {
+                return null;
+            }
+
         } else {
             INode c = readNode(x, i);
             return get(c, k);
@@ -62,12 +103,10 @@ public class BPTree implements Itree {
         INode r = root;
 
         if (r.isFull()) {
-            INode s = newNode(false,true);
+            INode s = newNode(false, true);
             this.root = s;
             s.setType(BaseNode.INTERNAL);
             s.setChild(0, r.id());
-
-            System.out.println(String.format("split at key=[%s] ", k));
 
             splitChild(s, r, 0);
             insertNoFull(s, k);
@@ -80,7 +119,9 @@ public class BPTree implements Itree {
     private void splitChild(INode x, INode y, int i) {
 
 
-        INode z = newNode(y.isLeaf(),true);
+        System.out.println(String.format("node: %s, split at key=[%s] ", y.id(),y.getKey(order - 1)));
+
+        INode z = newNode(y.isLeaf(), true);
         z.setType(y.type());
         y.setNext(z.id());
 
@@ -97,7 +138,7 @@ public class BPTree implements Itree {
             }
         }
 
-        y.setKeySize(order - 1);
+        y.setKeySize(order);
         z.setKeySize(order - 1);
 
 
@@ -153,13 +194,17 @@ public class BPTree implements Itree {
 
     }
 
-    private INode readNode(INode p, int i) {
-        int id = p.getChild(i);
+    private INode readNodeById(int id) {
+
+        if(id == 0){
+            return null;
+        }
+
         boolean leaf = id < 0;
         int nodeId = Math.abs(id);
         final ByteBuffer buf = storage.get(nodeId);
 
-        INode node = newNode(leaf,false);
+        INode node = newNode(leaf, false);
         node.setId(id);
 
         node.deSerialize(buf);
@@ -169,8 +214,25 @@ public class BPTree implements Itree {
         return node;
     }
 
+    private INode readNode(INode p, int i) {
+        long begin = System.currentTimeMillis();
+        int id = p.getChild(i);
+        INode iNode = readNodeById(id);
+        long end = System.currentTimeMillis();
+
+//        System.out.println(String.format("readNode spent: %s", end - begin));
+
+        return iNode;
+    }
+
+    @Override
+    public void sync() {
+        storage.sync();
+    }
 
     private void flushNode(INode node) {
+
+        long begin = System.currentTimeMillis();
 
         final FileBlockStore.WriteBuffer wbuf = storage.set(Math.abs(node.id()));
         final ByteBuffer buf = wbuf.buf();
@@ -178,13 +240,17 @@ public class BPTree implements Itree {
         buf.flip();
         wbuf.save();
 
-        storage.sync();
+//        storage.sync();
+
+        long end = System.currentTimeMillis();
+
+//        System.out.println(String.format("flushNode spent: %s", end - begin));
     }
 
-    private INode newNode(boolean leaf,boolean newId) {
+    private INode newNode(boolean leaf, boolean newId) {
         BaseNode node = new BaseNode(this);
         node.setType(BaseNode.LEAF);
-        if(newId){
+        if (newId) {
             node.setId(allocatedId(leaf));
         }
         return node;
@@ -234,7 +300,7 @@ public class BPTree implements Itree {
         }
 
 
-        this.root = newNode(true,true);
+        this.root = newNode(true, true);
         this.root.setType(BaseNode.LEAF);
         this.storage = new FileBlockStore(filename, blockSize, false);
 

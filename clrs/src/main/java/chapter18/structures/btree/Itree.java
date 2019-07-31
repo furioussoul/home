@@ -2,25 +2,9 @@ package chapter18.structures.btree;
 
 public interface Itree {
 
-    void dump();
-    long get(int key);
+    long get(int k);
+    void put(int k);
+    void init(String filename, int blockSize);
 
-    INode put(int key, long data);
-    long rangeGet(int key1, int key2);
-    Itree init(String filename, int blockSize);
-    void destroy();
-    int openFile(String filename);
-    void closeFile(int fd);
-
-    int incrementLevel();
-
-    int allocNodeId(final boolean isLeaf);
-    void initList(Link link);
-
-    int maxOrder();
-
-    class Link {
-        Link prev;
-        Link next;
-    }
+    int order();
 }

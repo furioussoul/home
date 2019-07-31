@@ -14,22 +14,22 @@ import org.junit.Test;
  */
 public class TestBPTree {
 
+    public static final String FILE_PATH = "/tmp/bptree.data";
+    public static final int BLOCK_SIZE = 512; //kb
 
     @Test
-    public void test_leaf_split_left() {
+    public void testTree() {
         BPTree bpTree = new BPTree();
-        bpTree.maxOrder = 6;
+        bpTree.init(FILE_PATH, BLOCK_SIZE);
 
-        INode leaf = new BaseNode(bpTree);
-        leaf.setChildrenSize(6);
-        leaf.setKeys(new int[]{1, 4, 6, 8, 10, 12});
-        leaf.setData(new long[]{311, 311, 311, 311, 311, 311});
-        INode left = new BaseNode(bpTree);
-        int key = 1;
-        long data = 314;
-        int insert = 1;
+        for (int i = 0; i < 100; i++) {
+            bpTree.put(i);
+        }
 
-        int leafsLeastKeyAfterSplit = bpTree.leafSplitLeft(leaf, left, key, data, insert);
-        System.out.println(leafsLeastKeyAfterSplit);
+
+        for (int i = 0; i < 100; i++) {
+            System.out.println(bpTree.get(i));
+        }
+
     }
 }

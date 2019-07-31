@@ -1,6 +1,8 @@
 package chapter18.structures.btree;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Demo class
@@ -11,118 +13,107 @@ import java.nio.ByteBuffer;
  */
 public class BaseNode implements INode {
 
+    public static int LEAF = 0;
+    public static int INTERNAL = 1;
+
     Itree tree;
-    int childrenSize;
-    int[] keys;
-    long[] data;
-    INode prev;
-    INode next;
-    INode parent;
+    int type;
+    int keySize;
+
+    List<Integer> keys;
+    List<Long> data;
+    List<INode> children;
 
     public BaseNode(Itree tree) {
         this.tree = tree;
-        this.keys = new int[tree.maxOrder()];
-        this.data = new long[tree.maxOrder()];
-    }
-
-    @Override
-    public void setKeys(int[] keys) {
-        this.keys = keys;
-    }
-
-    @Override
-    public int[] keys() {
-        return keys;
-    }
-
-    @Override
-    public void setData(long[] data) {
-        this.data = data;
-    }
-
-    @Override
-    public long[] data() {
-        return data;
-    }
-
-    @Override
-    public int childrenSize() {
-        return childrenSize;
-    }
-
-    @Override
-    public INode[] children() {
-        return new INode[0];
-    }
-
-    @Override
-    public void setChildrenSize(int size) {
-        childrenSize = size;
-    }
-
-    @Override
-    public void incrementChildren() {
-        childrenSize++;
-    }
-
-    @Override
-    public int type() {
-        return 0;
-    }
-
-    @Override
-    public void setType(int type) {
-
-    }
-
-    @Override
-    public int offset() {
-        return 0;
-    }
-
-    @Override
-    public void setId(int nodeId) {
-
-    }
-
-    @Override
-    public void setChild(int index, INode child) {
-
-    }
-
-    @Override
-    public void setParent(INode parent) {
-        this.parent = parent;
-    }
-
-    @Override
-    public INode getPrev() {
-        return prev;
-    }
-
-    @Override
-    public void setPrev(INode prev) {
-        this.prev = prev;
-    }
-
-    @Override
-    public INode getNext() {
-        return next;
-    }
-
-    @Override
-    public void setNext(INode next) {
-        this.next = next;
-    }
-
-    @Override
-    public INode parent() {
-        return parent;
+        this.keys = new ArrayList<>(2*tree.order()-1);
+        this.data = new ArrayList<>();
+        this.children = new ArrayList<>(2*tree.order());
     }
 
     @Override
     public boolean isFull() {
-        return childrenSize() == tree.maxOrder();
+        return keys.size() == tree.order() * 2 - 1;
+    }
+
+    @Override
+    public void setChild(int index, INode child) {
+        if(children.size() == index){
+            this.children.add(child);
+        }else {
+            this.children.set(index, child);
+        }
+    }
+
+    @Override
+    public void setKeySize(int size) {
+        this.keySize = size;
+    }
+
+    @Override
+    public int keySize() {
+        return keySize;
+    }
+
+    @Override
+    public List<Integer> getKeys() {
+        return keys;
+    }
+
+    @Override
+    public void setKey(int i, int k) {
+        if(keys.size()== i){
+            keys.add(k);
+        }else {
+            keys.set(i, k);
+        }
+    }
+
+    @Override
+    public int getKey(int i) {
+        return keys.get(i);
+    }
+
+    public void setKeys(List<Integer> keys) {
+        this.keys = keys;
+    }
+
+    public List<Long> getData() {
+        return data;
+    }
+
+    public void setData(List<Long> data) {
+        this.data = data;
+    }
+
+    @Override
+    public INode getChild(int i) {
+        return children.get(i);
+    }
+
+    @Override
+    public List<INode> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<INode> children) {
+        this.children = children;
+    }
+
+    @Override
+    public int type() {
+        return type;
+    }
+
+    @Override
+    public void setType(int type) {
+        this.type = type;
+    }
+
+
+    @Override
+    public boolean isLeaf() {
+        return this.type() == LEAF;
     }
 
     @Override

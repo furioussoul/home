@@ -1,49 +1,30 @@
 package chapter18.structures.btree;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 public interface INode {
 
 
-
-    static int byteSize() {
-        return 1;
-    }
-
-    void setKeys(int[] keys);
-    int[] keys();
-
-    void setData(long[] data);
-    long[] data();
-
-    int childrenSize();
-    INode[] children();
-
-    void setChildrenSize(int size);
-
-    void incrementChildren();
     int type();
 
     void setType(int type);
-    int offset();
 
-    void setId(int nodeId);
+    boolean isLeaf();
 
     void setChild(int index, INode child);
-
-    void setParent(INode parent);
-
-    INode getPrev();
-
-    void setPrev(INode prev);
-
-    INode getNext();
-
-    void setNext(INode next);
-
-    INode parent();
 
     boolean isFull();
 
     void serialize(final ByteBuffer buf);
+
+    void setKeySize(int size);
+    int keySize();
+
+    int getKey(int i);
+    void setKey(int i, int k);
+    INode getChild(int i);
+
+    List<Integer> getKeys();
+    List<INode> getChildren();
 }

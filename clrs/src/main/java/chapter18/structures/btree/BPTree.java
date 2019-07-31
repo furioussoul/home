@@ -53,10 +53,10 @@ public class BPTree implements Itree {
         message.setKeys(keys);
 
 
-        do{
+        do {
             for (int i = 0; i < node.keySize(); i++) {
                 int key = node.getKey(i);
-                if(key>=from && key <= to){
+                if (key >= from && key <= to) {
                     keys.add(key);
                 }
                 if (key > to) {
@@ -64,7 +64,7 @@ public class BPTree implements Itree {
                 }
 
             }
-        }while ((node = readNodeById(node.getNext())) != null);
+        } while ((node = readNodeById(node.getNext())) != null);
 
 
         return message;
@@ -85,9 +85,9 @@ public class BPTree implements Itree {
 
         } else if (x.isLeaf()) {
 
-            if(k<x.getKey(0)){
+            if (k < x.getKey(0)) {
                 return new Message(x, i);
-            }else {
+            } else {
                 return null;
             }
 
@@ -119,7 +119,8 @@ public class BPTree implements Itree {
     private void splitChild(INode x, INode y, int i) {
 
 
-        System.out.println(String.format("node: %s, split at key=[%s] ", y.id(),y.getKey(order - 1)));
+        System.out.println(String.format("%s node: %s, split at key=[%s] ",
+                y.type() == BaseNode.LEAF ? "leaf" : "internal", y.id(), y.getKey(order - 1)));
 
         INode z = newNode(y.isLeaf(), true);
         z.setType(y.type());
@@ -196,7 +197,7 @@ public class BPTree implements Itree {
 
     private INode readNodeById(int id) {
 
-        if(id == 0){
+        if (id == 0) {
             return null;
         }
 

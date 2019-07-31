@@ -6,7 +6,7 @@ import chapter18.structures.btree.INode;
 import org.junit.Test;
 
 /**
- * Demo class
+ * TestBPTree
  *
  * @author 孙证杰
  * @email 200765821@qq.com
@@ -22,12 +22,12 @@ public class TestBPTree {
         BPTree bpTree = new BPTree();
         bpTree.init(FILE_PATH, BLOCK_SIZE);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             bpTree.put(i);
         }
 
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             System.out.println(bpTree.get(i));
         }
 

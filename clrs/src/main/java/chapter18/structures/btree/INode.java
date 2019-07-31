@@ -5,6 +5,9 @@ import java.util.List;
 
 public interface INode {
 
+    void setNext(int id);
+    int id();
+    void setId(int id);
 
     int type();
 
@@ -12,19 +15,20 @@ public interface INode {
 
     boolean isLeaf();
 
-    void setChild(int index, INode child);
-
     boolean isFull();
 
     void serialize(final ByteBuffer buf);
+    void deSerialize(final ByteBuffer buf);
 
     void setKeySize(int size);
     int keySize();
 
     int getKey(int i);
     void setKey(int i, int k);
-    INode getChild(int i);
 
-    List<Integer> getKeys();
-    List<INode> getChildren();
+    int getChild(int i);
+    void setChild(int index, int childId);
+
+
+    int nodeByteSize();
 }

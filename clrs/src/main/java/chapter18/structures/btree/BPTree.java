@@ -62,11 +62,14 @@ public class BPTree implements Itree {
         INode r = root;
 
         if (r.isFull()) {
-            INode s = newNode();
+            INode s = newNode(false,true);
             this.root = s;
             s.setType(BaseNode.INTERNAL);
-            s.setChild(0, r);
-            splitChild(s, 0);
+            s.setChild(0, r.id());
+
+            System.out.println(String.format("split at key=[%s] ", k));
+
+            splitChild(s, r, 0);
             insertNoFull(s, k);
         } else {
             insertNoFull(r, k);
@@ -74,12 +77,12 @@ public class BPTree implements Itree {
     }
 
 
-    private void splitChild(INode x, int i) {
+    private void splitChild(INode x, INode y, int i) {
 
-        INode z = newNode();
-        INode y = x.getChild(i);
+
+        INode z = newNode(y.isLeaf(),true);
         z.setType(y.type());
-
+        y.setNext(z.id());
 
         //mv t-1 keys from y to z
         //for now, y has t keys
@@ -108,7 +111,7 @@ public class BPTree implements Itree {
         for (int j = x.keySize(); j >= i + 1; j--) {
             x.setChild(j + 1, x.getChild(j));
         }
-        x.setChild(i + 1, z);
+        x.setChild(i + 1, z.id());
 
 
         x.setKeySize(x.keySize() + 1);
@@ -136,29 +139,40 @@ public class BPTree implements Itree {
             }
             i++;
 
-            INode c = x.getChild(i);
+            INode c = readNode(x, i);
 
             if (c.isFull()) {
-                splitChild(x, i);
+                splitChild(x, c, i);
                 if (k > x.getKey(i)) {
                     i++;
                 }
             }
 
-            insertNoFull(x.getChild(i), k);
+            insertNoFull(readNode(x, i), k);
         }
 
     }
 
     private INode readNode(INode p, int i) {
-        //todo disk
-        return p.getChild(i);
+        int id = p.getChild(i);
+        boolean leaf = id < 0;
+        int nodeId = Math.abs(id);
+        final ByteBuffer buf = storage.get(nodeId);
+
+        INode node = newNode(leaf,false);
+        node.setId(id);
+
+        node.deSerialize(buf);
+
+        storage.release(buf);
+
+        return node;
     }
 
 
     private void flushNode(INode node) {
 
-        final FileBlockStore.WriteBuffer wbuf = storage.set(ID.incrementAndGet());
+        final FileBlockStore.WriteBuffer wbuf = storage.set(Math.abs(node.id()));
         final ByteBuffer buf = wbuf.buf();
         node.serialize(buf);
         buf.flip();
@@ -167,10 +181,22 @@ public class BPTree implements Itree {
         storage.sync();
     }
 
-    private INode newNode() {
+    private INode newNode(boolean leaf,boolean newId) {
         BaseNode node = new BaseNode(this);
         node.setType(BaseNode.LEAF);
+        if(newId){
+            node.setId(allocatedId(leaf));
+        }
         return node;
+    }
+
+    private int allocatedId(boolean leaf) {
+        int id = ID.incrementAndGet();
+        if (leaf) {
+            return -id;
+        } else {
+            return id;
+        }
     }
 
 
@@ -182,6 +208,9 @@ public class BPTree implements Itree {
             return;
         }
 
+
+        this.filename = filename;
+        this.blockSize = blockSize;
 
         order = getOptimalOrder();
         if (order <= 2) {
@@ -204,9 +233,8 @@ public class BPTree implements Itree {
             e.printStackTrace();
         }
 
-        this.filename = filename;
 
-        this.root = newNode();
+        this.root = newNode(true,true);
         this.root.setType(BaseNode.LEAF);
         this.storage = new FileBlockStore(filename, blockSize, false);
 
@@ -220,6 +248,14 @@ public class BPTree implements Itree {
     }
 
     public int getOptimalOrder() {
-        return 10;
+        //k+v+child pointer
+        int kvSize = 4 + 8;
+        int childSize = 4;
+
+        int order = ((blockSize - childSize) / (kvSize + childSize) + 1) / 2;
+
+        System.out.println(order);
+
+        return order;
     }
 }

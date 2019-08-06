@@ -18,25 +18,46 @@ import java.util.List;
 public class TestBPTree {
 
     public static final String FILE_PATH = "/tmp/bptree.data";
-    public static final int BLOCK_SIZE = 512; //kb
+    public static final int BLOCK_SIZE = 1 * 1024; //kb
+
+
+    int TOTAL = 100 * 10000;
+    int FLUSH_SIZE = 20000;
 
     @Test
     public void testPutAndGet() {
+
+        System.out.println(String.format("start test : BLOCK_SIZE:%s, FLUSH_SIZE:%s,TOTAL:%s", BLOCK_SIZE, FLUSH_SIZE
+                , TOTAL));
+
         BPTree bpTree = new BPTree();
         bpTree.init(FILE_PATH, BLOCK_SIZE);
 
-        for (int i = 0; i < 2000000000; i++) {
+        long begin = System.currentTimeMillis();
+
+
+        for (int i = 0; i < TOTAL; i++) {
             bpTree.put(i);
+            if (i % FLUSH_SIZE == 0) {
+                bpTree.sync();
+            }
         }
 
-        System.out.println("finish put");
+        long end = System.currentTimeMillis();
 
-        for (int i = 0; i < 2000000000; i++) {
+        System.out.println("write spent : " + (end - begin));
+
+        begin = System.currentTimeMillis();
+
+        for (int i = 0; i < TOTAL; i++) {
             Message message = bpTree.get(i);
             Assert.assertNotNull(message);
             Assert.assertEquals(i, message.getNode().getKey(message.getKeyIndex()));
         }
 
+        end = System.currentTimeMillis();
+
+        System.out.println("read spent : " + (end - begin));
     }
 
 
@@ -85,7 +106,7 @@ public class TestBPTree {
         Message message = bpTree.rangeGet(from, to);
         Assert.assertNotNull(message);
         List keys = message.getKeys();
-        System.out.println(String.format("size: %s, first: %s, last: %s", keys.size(), keys.get(0), keys.get(keys.size() - 1)));
+        System.out.println(String.format("TOTAL: %s, first: %s, last: %s", keys.size(), keys.get(0), keys.get(keys.size() - 1)));
     }
 
     private void assertRangeGet(BPTree bpTree, int from, int to) {

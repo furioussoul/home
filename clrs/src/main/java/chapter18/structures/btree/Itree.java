@@ -10,4 +10,6 @@ public interface Itree {
     void sync();
 
     int order();
+
+    INode root();
 }

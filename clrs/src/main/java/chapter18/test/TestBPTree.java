@@ -18,7 +18,7 @@ import java.util.List;
 public class TestBPTree {
 
     public static final String FILE_PATH = "/tmp/bptree.data";
-    public static final int BLOCK_SIZE = 1 * 1024; //kb
+    public static final int BLOCK_SIZE = 4 * 1024; //kb
 
 
     int TOTAL = 100 * 10000;

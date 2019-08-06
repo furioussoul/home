@@ -100,7 +100,7 @@ public class BPTree implements Itree {
         INode r = root;
 
         if (r.isFull()) {
-            INode s = NodeFactory.newNode(false, true, this);
+            INode s = NodeFactory.newNode(false, true);
             this.root = s;
             s.setType(BaseNode.INTERNAL);
             s.setChild(0, r.id());
@@ -119,7 +119,7 @@ public class BPTree implements Itree {
         System.out.println(String.format("%s node: %s, split at key=[%s] ",
                 y.type() == BaseNode.LEAF ? "leaf" : "internal", y.id(), y.getKey(order - 1)));
 
-        INode z = NodeFactory.newNode(y.isLeaf(), true, this);
+        INode z = NodeFactory.newNode(y.isLeaf(), true);
         z.setType(y.type());
         y.setNext(z.id());
 
@@ -185,9 +185,12 @@ public class BPTree implements Itree {
                 if (k > x.getKey(i)) {
                     i++;
                 }
+            }else {
+                NodeFactory.release(c);
             }
 
             insertNoFull(readNode(x, i), k);
+            NodeFactory.release(x);
         }
     }
 
@@ -201,7 +204,7 @@ public class BPTree implements Itree {
         int nodeId = Math.abs(id);
         final ByteBuffer buf = storage.get(nodeId);
 
-        INode node = NodeFactory.newNode(leaf, false, this);
+        INode node = NodeFactory.newNode(leaf, false);
         node.setId(id);
 
         node.deSerialize(buf);
@@ -280,14 +283,15 @@ public class BPTree implements Itree {
         }
 
 
-        this.root = NodeFactory.newNode(true, true, this);
+        NodeFactory.init(this);
+
+        this.root = NodeFactory.newNode(true, true);
         this.root.setType(BaseNode.LEAF);
         this.storage = new FileBlockStore(filename, blockSize, false);
 
         storage.delete();
         storage.open();
 
-        NodeFactory.init(this);
     }
 
     @Override
@@ -305,5 +309,9 @@ public class BPTree implements Itree {
         System.out.println(order);
 
         return order;
+    }
+
+    public INode root() {
+        return root;
     }
 }

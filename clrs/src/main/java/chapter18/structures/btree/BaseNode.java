@@ -66,7 +66,7 @@ public class BaseNode implements INode {
 
     @Override
     public boolean isFull() {
-        return keys.size() == tree.order() * 2 - 1;
+        return keySize >= tree.order() * 2 - 1;
     }
 
     @Override
@@ -150,6 +150,7 @@ public class BaseNode implements INode {
         buf.clear();
         buf.putInt(id);
         buf.putInt(keySize);
+
         for (int i = 0; i < keySize; i++) {
             buf.putInt(keys.get(i));
         }

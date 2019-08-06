@@ -4,6 +4,9 @@ import java.nio.ByteBuffer;
 
 public interface INode {
 
+    int cacheIndex();
+
+    void setCacheIndex(int i);
     int getNext();
     void setNext(int id);
     int id();

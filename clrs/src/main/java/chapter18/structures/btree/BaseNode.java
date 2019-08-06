@@ -21,6 +21,7 @@ public class BaseNode implements INode {
     int keySize;
     int id;
     int next;
+    int cacheIndex;
 
     List<Integer> keys;
     List<Long> data;
@@ -31,6 +32,16 @@ public class BaseNode implements INode {
         this.keys = new ArrayList<>(2 * tree.order() - 1);
         this.data = new ArrayList<>();
         this.children = new ArrayList<>(2 * tree.order());
+    }
+
+    @Override
+    public int cacheIndex() {
+        return this.cacheIndex;
+    }
+
+    @Override
+    public void setCacheIndex(int i) {
+        this.cacheIndex = i;
     }
 
     @Override

@@ -6,10 +6,8 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * B+树
@@ -29,7 +27,6 @@ public class BPTree implements Itree {
     String filename;
     int blockSize;
 
-    public static final AtomicInteger ID = new AtomicInteger(0);
     FileBlockStore storage;
 
     @Override
@@ -103,7 +100,7 @@ public class BPTree implements Itree {
         INode r = root;
 
         if (r.isFull()) {
-            INode s = newNode(false, true);
+            INode s = NodeFactory.newNode(false, true, this);
             this.root = s;
             s.setType(BaseNode.INTERNAL);
             s.setChild(0, r.id());
@@ -122,7 +119,7 @@ public class BPTree implements Itree {
         System.out.println(String.format("%s node: %s, split at key=[%s] ",
                 y.type() == BaseNode.LEAF ? "leaf" : "internal", y.id(), y.getKey(order - 1)));
 
-        INode z = newNode(y.isLeaf(), true);
+        INode z = NodeFactory.newNode(y.isLeaf(), true, this);
         z.setType(y.type());
         y.setNext(z.id());
 
@@ -192,7 +189,6 @@ public class BPTree implements Itree {
 
             insertNoFull(readNode(x, i), k);
         }
-
     }
 
     private INode readNodeById(int id) {
@@ -205,7 +201,7 @@ public class BPTree implements Itree {
         int nodeId = Math.abs(id);
         final ByteBuffer buf = storage.get(nodeId);
 
-        INode node = newNode(leaf, false);
+        INode node = NodeFactory.newNode(leaf, false, this);
         node.setId(id);
 
         node.deSerialize(buf);
@@ -246,26 +242,9 @@ public class BPTree implements Itree {
         long end = System.currentTimeMillis();
 
 //        System.out.println(String.format("flushNode spent: %s", end - begin));
-    }
 
-    private INode newNode(boolean leaf, boolean newId) {
-        BaseNode node = new BaseNode(this);
-        node.setType(BaseNode.LEAF);
-        if (newId) {
-            node.setId(allocatedId(leaf));
-        }
-        return node;
+        NodeFactory.release(node);
     }
-
-    private int allocatedId(boolean leaf) {
-        int id = ID.incrementAndGet();
-        if (leaf) {
-            return -id;
-        } else {
-            return id;
-        }
-    }
-
 
     @Override
     public void init(String filename, int blockSize) {
@@ -301,12 +280,14 @@ public class BPTree implements Itree {
         }
 
 
-        this.root = newNode(true, true);
+        this.root = NodeFactory.newNode(true, true, this);
         this.root.setType(BaseNode.LEAF);
         this.storage = new FileBlockStore(filename, blockSize, false);
 
         storage.delete();
         storage.open();
+
+        NodeFactory.init(this);
     }
 
     @Override

@@ -15,7 +15,7 @@
       <module name="aa" target="1.8" />
       <module name="clrs" target="1.8" />
       <module name="ioc-aop" target="1.7" />
-      <module name="iocaop" target="1.7" />
+      <module name="iocaop" target="1.8" />
       <module name="soul_virtual_machine" target="1.7" />
       <module name="vm" target="1.7" />
     </bytecodeTargetLevel>

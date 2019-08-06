@@ -13,9 +13,11 @@ public class NodeFactory {
 
     private static final AtomicInteger ID = new AtomicInteger(0);
     private static Itree TREE;
-    private static int MIN_CACHE_NUM = 5;
+    private static int MIN_CACHE_NUM = 25;
     private static int[] USED = new int[MIN_CACHE_NUM];
     private static INode[] NODE_CACHE = new INode[MIN_CACHE_NUM];
+    static int newSize;
+    static int releaseSize;
 
     public static void init(Itree tree) {
         TREE = tree;
@@ -27,6 +29,7 @@ public class NodeFactory {
     }
 
     public static INode newNode(boolean leaf, boolean newId) {
+
         INode node = null;
         for (int i = 0; i < MIN_CACHE_NUM; i++) {
             if (USED[i] == 0) {
@@ -39,14 +42,24 @@ public class NodeFactory {
                 break;
             }
         }
+
+        newSize++;
+//        System.out.println("newSize : " + newSize);
         return node;
     }
 
     public static void release(INode node) {
-        if(TREE.root() != node){
+        if(node.cacheIndex() > -1){
+            releaseSize++;
+//            System.out.println("releaseSize : " + releaseSize);
             USED[node.cacheIndex()] = 0;
-            node.setKeySize(0);
+            node.setId(0);
+            node.setNext(0);
+            node.clearKey();
+            node.clearChildren();
+            node.clearData();
         }
+
     }
 
     public static int allocatedId(boolean leaf) {

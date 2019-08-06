@@ -21,7 +21,7 @@ public class BaseNode implements INode {
     int keySize;
     int id;
     int next;
-    int cacheIndex;
+    int cacheIndex = -1;
 
     List<Integer> keys;
     List<Long> data;
@@ -79,6 +79,11 @@ public class BaseNode implements INode {
     }
 
     @Override
+    public void clearData() {
+        this.data.clear();
+    }
+
+    @Override
     public void setKeySize(int size) {
         this.keySize = size;
     }
@@ -89,12 +94,23 @@ public class BaseNode implements INode {
     }
 
     @Override
+    public void clearKey() {
+        this.keys.clear();
+        this.keySize = 0;
+    }
+
+    @Override
     public void setKey(int i, int k) {
         if (keys.size() == i) {
             keys.add(k);
         } else {
             keys.set(i, k);
         }
+    }
+
+    @Override
+    public void clearChildren() {
+        this.children.clear();
     }
 
     @Override

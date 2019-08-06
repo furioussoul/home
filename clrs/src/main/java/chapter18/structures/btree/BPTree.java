@@ -90,6 +90,7 @@ public class BPTree implements Itree {
 
         } else {
             INode c = readNode(x, i);
+            NodeFactory.release(x);
             return get(c, k);
         }
     }
@@ -100,7 +101,13 @@ public class BPTree implements Itree {
         INode r = root;
 
         if (r.isFull()) {
-            INode s = NodeFactory.newNode(false, true);
+
+            BaseNode s = new BaseNode(this);
+            s.setType(BaseNode.LEAF);
+            s.setId(NodeFactory.allocatedId(false));
+
+
+
             this.root = s;
             s.setType(BaseNode.INTERNAL);
             s.setChild(0, r.id());
@@ -158,6 +165,9 @@ public class BPTree implements Itree {
         flushNode(x);
         flushNode(z);
         flushNode(y);
+        NodeFactory.release(z);
+        NodeFactory.release(y);
+
     }
 
 
@@ -172,11 +182,14 @@ public class BPTree implements Itree {
             x.setKey(i + 1, k);
             x.setKeySize(x.keySize() + 1);
             flushNode(x);
+            NodeFactory.release(x);
         } else {
             while (i >= 0 && k < x.getKey(i)) {
                 i--;
             }
             i++;
+
+            int tmp = i;
 
             INode c = readNode(x, i);
 
@@ -185,11 +198,12 @@ public class BPTree implements Itree {
                 if (k > x.getKey(i)) {
                     i++;
                 }
-            }else {
-                NodeFactory.release(c);
             }
 
-            insertNoFull(readNode(x, i), k);
+            if (tmp != i) {
+                c = readNode(x, i);
+            }
+            insertNoFull(c, k);
             NodeFactory.release(x);
         }
     }
@@ -205,6 +219,7 @@ public class BPTree implements Itree {
         final ByteBuffer buf = storage.get(nodeId);
 
         INode node = NodeFactory.newNode(leaf, false);
+
         node.setId(id);
 
         node.deSerialize(buf);
@@ -218,6 +233,7 @@ public class BPTree implements Itree {
         long begin = System.currentTimeMillis();
         int id = p.getChild(i);
         INode iNode = readNodeById(id);
+
         long end = System.currentTimeMillis();
 
 //        System.out.println(String.format("readNode spent: %s", end - begin));
@@ -246,7 +262,6 @@ public class BPTree implements Itree {
 
 //        System.out.println(String.format("flushNode spent: %s", end - begin));
 
-        NodeFactory.release(node);
     }
 
     @Override
@@ -286,6 +301,12 @@ public class BPTree implements Itree {
         NodeFactory.init(this);
 
         this.root = NodeFactory.newNode(true, true);
+
+        BaseNode root = new BaseNode(this);
+        root.setType(BaseNode.LEAF);
+        root.setId(NodeFactory.allocatedId(true));
+        this.root = root;
+
         this.root.setType(BaseNode.LEAF);
         this.storage = new FileBlockStore(filename, blockSize, false);
 

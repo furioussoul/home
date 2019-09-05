@@ -21,7 +21,7 @@ public class BaseNode implements INode {
     int keySize;
     int id;
     int next;
-    int cacheIndex;
+    int cacheIndex = -1;
 
     List<Integer> keys;
     List<Long> data;
@@ -66,7 +66,7 @@ public class BaseNode implements INode {
 
     @Override
     public boolean isFull() {
-        return keys.size() == tree.order() * 2 - 1;
+        return keySize >= tree.order() * 2 - 1;
     }
 
     @Override
@@ -76,6 +76,11 @@ public class BaseNode implements INode {
         } else {
             this.children.set(index, childId);
         }
+    }
+
+    @Override
+    public void clearData() {
+        this.data.clear();
     }
 
     @Override
@@ -89,12 +94,23 @@ public class BaseNode implements INode {
     }
 
     @Override
+    public void clearKey() {
+        this.keys.clear();
+        this.keySize = 0;
+    }
+
+    @Override
     public void setKey(int i, int k) {
         if (keys.size() == i) {
             keys.add(k);
         } else {
             keys.set(i, k);
         }
+    }
+
+    @Override
+    public void clearChildren() {
+        this.children.clear();
     }
 
     @Override
@@ -150,6 +166,7 @@ public class BaseNode implements INode {
         buf.clear();
         buf.putInt(id);
         buf.putInt(keySize);
+
         for (int i = 0; i < keySize; i++) {
             buf.putInt(keys.get(i));
         }

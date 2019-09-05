@@ -26,12 +26,14 @@ public interface INode {
     void setKeySize(int size);
     int keySize();
 
+    void clearKey();
     int getKey(int i);
     void setKey(int i, int k);
 
+    void clearChildren();
     int getChild(int i);
     void setChild(int index, int childId);
 
-
+    void clearData();
     int nodeByteSize();
 }

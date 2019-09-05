@@ -2,6 +2,7 @@ package chapter18.test;
 
 import chapter18.structures.btree.BPTree;
 import chapter18.structures.btree.Message;
+import chapter18.structures.btree.NodeFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -18,11 +19,11 @@ import java.util.List;
 public class TestBPTree {
 
     public static final String FILE_PATH = "/tmp/bptree.data";
-    public static final int BLOCK_SIZE = 1 * 1024; //kb
+    public static final int BLOCK_SIZE = 32 * 1024; //kb
 
 
     int TOTAL = 100 * 10000;
-    int FLUSH_SIZE = 20000;
+    int FLUSH_SIZE = 100000;
 
     @Test
     public void testPutAndGet() {
@@ -47,17 +48,27 @@ public class TestBPTree {
 
         System.out.println("write spent : " + (end - begin));
 
+        NodeFactory.init(bpTree);
+
         begin = System.currentTimeMillis();
 
         for (int i = 0; i < TOTAL; i++) {
             Message message = bpTree.get(i);
             Assert.assertNotNull(message);
             Assert.assertEquals(i, message.getNode().getKey(message.getKeyIndex()));
+            NodeFactory.release(message.getNode());
         }
 
         end = System.currentTimeMillis();
 
         System.out.println("read spent : " + (end - begin));
+
+
+
+        int from = 100;
+        int to = 105;
+
+        assertRangeGet(bpTree, from, to);
     }
 
 
@@ -122,6 +133,7 @@ public class TestBPTree {
         expect.retainAll(message.getKeys());
         Assert.assertEquals(expectSize, expect.size());
         System.out.println(String.format("pass form: %s, to: %s", from, to));
+        NodeFactory.release(message.getNode());
     }
 
 
